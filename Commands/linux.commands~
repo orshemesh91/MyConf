@@ -1,0 +1,174 @@
+list volumes
+    ll /dev/disk/by-id
+
+kernel log
+    dmesg -wH
+
+kernel headers location in file system
+    /usr/src/kernel/<version>   or   /lib/modules/<version>/build
+
+dmesg dump from last run
+    /var/crash
+
+format boot ramdisk for kernel version failure
+    sudo mkinitrd /boot/initramfs-3.10.0-957.1.3.el7.x86_64.img 3.10.0-957.1.3.el7.x86_64 --force
+
+______________
+Bash commands
+--------------
+
+Sed:
+    replace string in file:
+        sed -i 's/source/target/g' <file_name>
+    recursively:
+        find <mydir> -type f -exec sed -i 's/source/target/g' {} +
+    multiple-line string:
+        sed -e :n -e '$!N;/\n.*\n/!{$!bn}; s/a\n* *b\n* *c/Alexander Kopzon/;P;D' < test.in
+SSH:
+    ssh <remote user_name@ip> -I <private key>
+    scp <local path> < remote user_name@ip:/remote path)>
+    scp <remote user_name@ip:/remote value)> <local path>
+
+Tar:
+    tar cvzf <tar name>.tar.gz <file path> (pack)
+    tar xvzf <tar path>(unpack)
+	
+Zip:
+    zip -r tecmint_files.zip tecmint_files
+	unzip tecmint_files.zip
+
+Mount:
+    mount –t vboxsf <share name (which you specified in the VM definitions)> <mount point (the inner VM directory)>
+    umount -a -t vboxsf (removes all mounted folders).
+
+Make:
+    Compiles to the current directory. While make install compiles to global paths of the OS.
+    -MD -MF <file_name>   -   show all recursive includes
+
+Find:
+    find -name "*.trc"
+    find . -type d -name 'received_*_output' | xargs rm -r
+	    delete all files with the given names
+    find -name <a> | xargs grep <b>
+	    find <a> in files with name <b>
+Grep:
+    grep -rni --include=Makefile* mos .
+	    grep "mos" only from files with names starting with Makefile.
+    -C<lines_to_show>
+	    show surrounding lines
+RPMs
+    rpm -Ivh <installation package path>           -      install
+    rpm -e <package name(not full name)>  -      erase.
+    rpm -qpl <package path>                           -      show package contents.
+    rpm -qa | grep <part_of_name>             - list all packages installed by RPM
+
+sar
+    -f        -       open sar binary.
+    -A      -        show all
+    ar
+    -t <library_name.a>       -       Writes to the standard output a table of contents for the library.
+
+diff -u
+    better styling of the diff information.
+less -S(Capital)
+    no line wrapping on terminal output.
+gcore -a -o <file_name> <pid>
+    throw core of process to file without stopping the process
+tr -d <caracter>
+    remove character from input.
+df/du -ch
+    show disk fragmentation
+ldd <binary_name>
+    show binary linkage dependencies.
+touch <file_name>
+    touch the file 
+ps -ef | grep <process_name_pattern>
+    search running procecsses
+ln -s <target> <link>
+    symbolic link
+	
+_______
+Tricks
+-------
+TODO Kopzon - fix stuff here
+File extention	${file_name##*.}	##-remove all occurrences
+		#-remove first occurrence
+		%-remove last occurrance
+Debug mode                	bash -x <script_name>	
+Last command staus	$?	
+Last command pid	$!	
+Show all environment variables	                       export > alex.log	Or "env" command
+Show alias command	                 type <alias_name>	
+Create device	                     truncate -s 500M <path_to_dev>	
+Test IO to device	        sudo dd if=/dev/urandom of=/regression/KopzonDev count=3000 bs=1M	
+Pause terminal	                  C+s	
+Resume terminal	                 C+q	
+Storage management	Lsblk	
+	
+Find what eats all storage	Du -ch | sort -h | tail	
+Disk space image	df	
+Watch Sar binary	Sar -f <file>	
+$(func) &	Creates process which evaluates the func in background!!!	Not running the func in background
+Extract rpm to current directory	rpm2cpio ~/SharedWithVM/kernel-devel-3.10.0-693.el7.x86_64.rpm | cpio -idmv	
+Module info	Modinfo <module.ko>	
+Core placement	Sysctl kernel.core_pattern	
+
+
+______________
+IO
+--------------
+sudo fio --name=f --ioengine=libaio --rw=randread  --bs=1M --size=4T --numjobs=4 --iodepth=64 --thread --direct=1 --filename=/dev/scinia -number_ios=1 --norandommap --eta=always2
+sudo fio --name=f --ioengine=libaio --rw=randwrite --bs=4k --numjobs=1 --iodepth=32 --size=10% --thread --direct=1 --filename=/dev/scinia --output=/tmp/fio_fill_dev_scinia --output-format=json
+
+______________
+Small scripts
+--------------
+
+Batch rename files in folder
+    for file in *.cpp; do mv "$file" "$(echo $file | sed 's/.cpp/.C/g')"; done
+
+Grep string from traces in few directories
+    for file in *; do grep -C 50 -ni "found to be stuck" $file/*/sds/logs/*; echo ===== $file ===== ; done > found_to_be_stuck.out
+
+________________
+Complex Commands
+----------------
+
+get kernel crash falling line:
+
+[Mon Jun 08 11:08:58 root@sio-dcoe-112BY-17 127.0.0.1-2015-06-08-21:10:09]#nm -l /bin/emc/scaleio/scini.ko | grep netChan_ChooseCon
+0000000000000260 t netChan_ChooseCon    /emc/svc_flashbld/workspace/ScaleIO-RHEL6/src/ini/net/net_channel.c:3052
+
+<4>Pid: 7568, comm: fio Tainted: P           ---------------    2.6.32-358.el6.x86_64 #1 Cisco Systems Inc UCSC-C240-M3S/UCSC-C240-M3S
+<4>RIP: 0010:[<ffffffffa01f04e8>]  [<ffffffffa01f04e8>] netChan_ChooseCon+0x288/0x370 [scini]
+<4>RSP: 0018:ffff8810714b9988  EFLAGS: 00010046
+<4>RAX: ffff880870a2a8c0 RBX: 0000000000000000 RCX: 0000000000000000
+<4>RDX: 0000000000000001 RSI: 0000000000000001 RDI: 0000000000000033
+<4>RBP: ffff8810714b9a18 R08: 0000000000000000 R09: ffff880856bd2ec0
+<4>R10: 0000000000000000 R11: ffff880859f981d8 R12: ffff880859f981d8
+<4>R13: 0000000000000001 R14: 00000000ffffffff R15: ffff880859f981f8
+<4>FS:  00007f841d01c700(0000) GS:ffff880045800000(0000) knlGS:0000000000000000
+<4>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>CR2: 00000000000007f0 CR3: 00000010714bd000 CR4: 00000000001407e0
+<4>DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+<4>DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+
+addr2line -i -e /bin/emc/scaleio/scini.ko 0x4e8
+
+--------  OR  --------
+
+crash /usr/lib/debug/lib/modules/`uname -r`/vmlinux /var/crash/<date>/vmcore
+dis <function_name>
+
+checkout build tag
+objdump -S scini.ko > sciniObjdump.out (if didn't compile on local machine, should substitute path by objdump flags: strip/cut/prefix)
+
+update lib/modules with corrent kernel debug symbols if needed:
+	sudo yum install kernel-debug-`uname -r
+	or
+	sudo debuginfo-install kernel-`uname -r`
+
+------------------------------------
+
+sync time on machines:
+echo 'server 10.254.140.21 iburst' >>/etc/ntp.conf  ;echo "Asia/Jerusalem" > /etc/sysconfig/clock; ln -sf /usr/share/zoneinfo/Asia/Jerusalem /etc/localtime ;ntpdate 10.254.140.21 ; yum install ntp –y ; systemctl start ntpd ; systemctl enable ntpd

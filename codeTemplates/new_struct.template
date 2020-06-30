@@ -1,0 +1,10 @@
+/**
+ * Data Structure Name: structName
+ *
+ * Description:
+ *   ...
+ *
+ **/
+typedef struct structName {
+    ...
+} structName, *PstructName;

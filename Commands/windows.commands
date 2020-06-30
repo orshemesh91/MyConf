@@ -1,0 +1,102 @@
+Connect to remote machine
+    WinKey s - "Remote desktop connection"
+
+Winkey r - uj
+    Open registry editor (all serial numbers + configurations)
+
+Sysinternals
+    Website with lots of windows interesting tools
+	
+OSR Online
+    Website with kernel code examples
+
+
+-----------------------------------------------------------------------------------
+
+1. define in VS build scini package with test-certificate
+2. build scini with certificate (properties->driver signing)
+3. copy certificate from "certmgr" to testing machine
+4. install certificate on testing machine
+5. On testing machine in command line, as administrator:
+•	bcdedit -set loadoptions DISABLE_INTEGRITY_CHECKS
+•	bcdedit -set TESTSIGNING ON
+•	bcdedit -set DEBUG ON
+6. Reboot.
+7. dbgview.exe
+8. run msi
+9. run verifier
+10. bcdedit /debug on
+11. bcdedit /dbgsettings net hostip:w.x.y.z port:n
+12. bcdedit /set "{dbgsettings}" busparams b.d.f
+13. reboot
+14. search for "regedit" to open registry
+15. Computer/HKEY_LOCAL_MACHINE/system/ControlSet001/Services/scini
+16. open core:
+    location - %systemroot%/MEMORY.DMP == C:/Windows/MEMORY.DMP
+	dump configuration - control pannel -> system and security - system - advanced system settings - advanced tab - system and recovery - settings
+	to debug we need C:\cygwin64\tmp\Kopzon\projects\kufsa\x64\Win7Debug\scini.pdb
+	set symbol path in windbg to the folder which contains the .pdb
+
+To activate drv_cfg: use 'cmd' 
+ 
+In order to see traces:
+There is debug tool that can listen to driver out (otherwise it's like /dev/null)
+1.	Install DebugView v4.9 from MMSFT site 
+    i.	https://docs.microsoft.com/en-us/sysinternals/downloads/debugview
+2.	In registry set iniAsyncTraceEnable
+3.	Set in debugView to listen to drivers
+
+OR
+
+1. if installed from .msi then SDCLogger should write SDC logs to the folder: "Program Files"\EMC\scaleio\sdc\logs
+
+
+
+
+
+
+
+
+
+
+
+Setup remote kernel debugging:
+------------------------------
+create two IPs for host and target
+https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/setting-up-a-network-debugging-connection
+busparams are located at:
+	control panel -> Network and Internet -> Network Connections -> right click on Ethernet1 (the relevant connection for the debug IP) -> properties -> Internet Protocol Version 4 (TCP/IPv4) -> properties -> check it is the correct ip -> return to first properties -> configure -> Details -> Location information -> value BLIAAAAAAAAAAAAA
+	
+
+
+Debugger:
+---------
+Key=2sa56r90k8hsz.21waurchbw4yo.1cevvatm9kvl.1t24h2j3h0b7d
+
+install windows driver verifier for kernel debug efissiency
+	cmd->verifier
+
+show debug information:
+	!analyze -v: (start with "Bugcheck Analysis")
+		if shows 0000000000 => we are on a break point (g to continue)
+	
+replace driver mapping to load remote binary instead of the existing(broken) one:
+	.kdfiles -m \Systemroot\Windows\system32\drivers\scini.sys C:\Users\Administrator\Desktop\scini.sys
+
+add system symbols:
+	srv*c:\MyServerSymbols*http://msdl.microsoft.com/download/symbols
+
+
+Recovery:
+---------
+bcdedit - shows what is the system disk
+"E:" - move to system disk
+del E:/Windows/system32/drivers/scini.sys - remove driver
+del Windows\INF\oem<num>.inf - remove driver info so it will not be able to recover itself (must check which oem number is our driver by hand :( )
+exit - quit console
+continue boot
+
+Windows development forum:
+--------------------------
+https://www.osronline.com/article.cfm%5earticle=23.htm
+

@@ -1,0 +1,7 @@
+START
+./trace_decompress -idir . -odir temp
+tar xvzf 10.234.210.65_get_info.tgz
+fhs
+show_events -f eventlog.db --full | grep -v -i cli_command | less
+grep -i "process start" getInfoDump_icpcdc101967/icpcdc101967/sds/logs/trc* | sort -k2
+grep -C1 IO-ERROR `find . -name messages|grep -i messages/messages` |grep -i -B1 'Reason \(ERROR\) RC \(ERROR\) Retry count \(1\)'

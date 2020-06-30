@@ -1,0 +1,43 @@
+________________
+simple commands
+----------------
+
+p <varname>                          -          Print
+c                                    -          Continue
+s                                    -          Step into
+n                                    -          Step over
+b <filename>:<linenum>               -          Breakpoint
+del <break_point_num>                -          Remove breakpoint
+dis <break_point_num>                -          Disable breakpoint
+ena <break_point_num>                -          Enable breakpoint
+info breakpoints                     -          Show list of breakpoints
+display <varname>                    -          Show var value on every breakpoint
+bt                                   -          Back Trace
+disas /m or disas <function_name>    -          Disassembley with c code interleaving
+gdb <path_to_binary> <path_to_core>  -          Load core dump
+attach <pid>                         -          Attach gdb to running process
+f <frame_number>                     -          Change frame
+info local                           -          Show all local variables of the frame
+--args <exe> <args>                  -          Run executable with arguments (Or while running "set args")
+set non-stop off                     -          Stop all threads on breakpoint
+set substitute-path <remote> <local> -          when could not find symbols(Check it with "list")
+set environment LD_LIBRARY_PATH=<dynamic_lib_path> -          when could not find symbols(Check it with "list")
+set print pretty on                  -          Pretty print  structs
+x /100xa $rsp                        -          See mem dump 100 addresses (words) from stack pointer
+watch -l <expr> or <*<pointer_hexa>> -          HW watch point on write only
+awatch -l                            -          HW watch point on red & write
+set pagination off - don't stop output for each page
+set logging on <out_file>    - log to file (default gdb.txt) file
+_______________________________
+Debug remote VM with gdbserver
+-------------------------------
+
+On remote:
+gdbserver :<port(4_numbers)> <binary> <args>
+
+On local:
+gdb <binary>
+	> target remote <remote_ip>:<port(4_numbers)>
+
+Debug kernel:
+gdb /usr/lib/debug/lib/modules/3.10.0-957.1.3.el7.x86_64/vmlinux

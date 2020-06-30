@@ -1,0 +1,52 @@
+###########################################################
+#################### terminal helpers #####################
+###########################################################
+alias ll='ls -l'
+alias lll='ls -al'
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias rmdir='rm -rf'
+alias bugs='cd ~/SharedWithVM/bugs'
+alias tasks='cd ~/SharedWithVM/tasks'
+alias ta='tmux attach -t'
+alias tl='tmux ls'
+alias sl='screen -ls'
+alias sa='screen -r'
+alias sc='screen -S'
+alias sd='screen -d'
+alias fs='wmctrl -r :ACTIVE: -btoggle,fullscreen'
+alias crashVM='sudo crash /usr/lib/debug/lib/modules/`uname -r`/vmlinux'
+function khg { grep -i "$1" ~/EnvKopzon/Commands/history --color; }
+alias khs="history 2 | head -1 | sed 's/[^ ]* *//' | sed 's/[^ ]* *//' >> ~/EnvKopzon/Commands/history"
+alias hg="history | grep"
+alias xsc='xclip -sel clip'
+alias Kopzon='cd ~/EnvKopzon'
+alias e='emacs ~/.emacs . &'
+alias et='emacs ~/.emacs . --no-window-system'
+alias cmake='/usr/local/bin/cmake'
+alias gtags_full='gtags --gtagsconf ~/EnvKopzon/.globalrcFull'
+alias tags_py='find . -name "*.py" -print | etags -'
+alias tags_el='find . -name "*.el" -print | etags -'
+alias tags_c='find . -name "*.c*" -o -name "*.h" -print | etags -'
+
+# $1 - pattern
+# $2 - src
+# $3 - dst
+function copy_files_by_pattern { if [ "$#" -ne 3 ]; then echo "args: pattern src dst"; else mkdir -p $3; find $2 -maxdepth 1 -type f | grep -i $1 | xargs -i cp {} $3; fi; }
+
+###########################################################
+########################### git ###########################
+###########################################################
+alias gl='git log --format="%h %C(bold red)%ad %Creset%Cred(%ar) %Creset%C(bold green)%an%C(bold yellow)%d %C(reset)%s" --date=short'
+alias lscore='ls $(dirname $(cat /proc/sys/kernel/core_pattern))/core*'
+alias gs='git branch && git status'
+alias gc='git checkout'
+alias gcb='git checkout -b'
+alias gpo='git push -u origin'
+alias gcp='git cherry-pick -x'
+alias gkf='git branch -r | grep -E 3\.[05].*Kernel-Fixes'
+
+# $1 - branch name
+function gcg { git checkout $1 && gtags; }
+

@@ -1,0 +1,60 @@
+title Comb Migration
+
+MDM->M SDS: AddComb(bNew=TRUE)
+
+MDM->P SDS: StartMigrate(M SDS, M Dev ID)
+P SDS->P SDS: SetCombState(COPY)
+P SDS->P SDS: StartMigrateJob()
+loop Migrate LoopAndCopy
+    P SDS->P SDS: SetCombState(COPY_STARTED)
+    P SDS->M SDS: Copy Tooth
+end
+alt Migrate LoopAndCopy SUCCESS
+    P SDS->P SDS: SetCombState(COPY_DONE)
+    P SDS->MDM: UpdateCombState(COPY_DONE)
+    MDM->P SDS: EndMigrate()
+note over P SDS:
+    Replace S SDS with M SDS:
+    pRebuild=pMigrate
+    pMigrate=NULL
+end note
+    
+else Migrate LoopAndCopy ERROR
+    note over P SDS: Abort Migrate Loop
+    P SDS->P SDS: SetCombState(COPY_ERR)
+    P SDS->MDM: UpdateCombState(COPY_ERR)
+    MDM->P SDS: AbortMigrate()
+note over P SDS:
+    Abort Migration:
+    
+    SetCombState(pMigrate(REMOTE_DEGRADED))
+    OR SetCombState(pMaintenance(MM_NORMAL))
+    
+    pMigrate=NULL
+    pRebuild unchanged
+end note
+
+else IO ERROR
+    note over P SDS: Abort Migrate Loop
+    P SDS->P SDS: SetCombState(NR/R_DEG/L_DEG)
+    P SDS->MDM: UpdateCombState(NR/R_DEG/L_DEG)
+    MDM->P SDS: AbortMigrate()
+note over P SDS:
+    Abort Migration
+end note
+
+else MDM initiates Abort Migrate
+    MDM->P SDS: AbortMigrate()
+note over P SDS:
+    Abort Migration
+end note
+
+else SDS reconfig (i.e. pkill), MDM didn't handle COPY_DONE
+    MDM->P SDS: AbortMigrate()
+note over P SDS:
+    Abort Migration
+end note
+
+else SDS reconfig (i.e. pkill), MDM handled COPY_DONE
+    MDM->P SDS: SetCombState(M SDS is Secondary)
+end

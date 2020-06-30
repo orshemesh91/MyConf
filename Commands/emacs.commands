@@ -1,0 +1,92 @@
+M-x revert-buffer	Update files from FS	(F5)
+C-k	Kill line	
+C-x C-c	Kill Emacs	
+C-l	Scroll window so cursor is in center	
+C-x C-t	Switch lines	
+C-x   h	Select all buffer's text	
+C-x   b	Open empty buffer	
+M->	End of buffer	
+M-x load-file	Reload file	for reloading .emacs file
+C-x C-e	Reload line	For reloading .emacs line
+C-x C-b	List all opened buffers	
+C-c C-c	Comment selected erea	
+C-u C-c C-c	Uncomment selected erea	
+M-x c-guess	Guess c style from file	
+M-x compile	Interactive compile	
+M-x customize	Interactive emacs configuration	
+M-x semantic-mode	Use c, c++ semantics by parsing the headers	Usage by C-M-I
+C-h b	Show key bindings available in given buffer	
+M-x ediff-buffers	Make diff two buffers	
+C-y M-y	Paste previous kills	
+C-x nn	Narrow	Open selected text in separate buffer
+C-x nw	Widen	Return to original buffer after narrow
+C-x (	Start macro	
+C-x )	End macro	
+C-x e (e…)	Play macro	
+C-x query-replace ENTER <query> ENTER <replace> ENTER		
+byte-compile-file "foo.el"	Compile .el file	
+C-u M-x shell	Open as much terminals as needed	
+M-x utubify      converts tabs into spaces
+M-c case sensitive search
+C-x C-o   -   list functions in buffer (outline)
+C-h m     -   reveal major and minor modes
+M-%       -   query-replace
+
+Highlight:
+M-s o	Command: occur
+ 	Run occur
+M-s h .	Command: highlight-symbol-at-point
+ 	Highlight the symbol at point
+M-s h l	Command: highlight-lines-matching-regexp
+ 	Highlight lines that match input regexp
+M-s h r	Command: highlight-regexp
+ 	Highlight according to regexp
+M-s h u	Command: unhighlight-regexp
+ 	Turn off highlighting strings that match
+ 	regexp.
+M-s h U   -   remove all highlighting
+
+Frames:
+C-x 5 0	Command: delete-frame
+ 	Delete the current frame point is in
+C-x 5 1	Command: delete-other-frames
+ 	Delete other frames except the one at point
+C-x 5 2	Command: make-frame-command
+ 	Create a frame
+C-x 5 o	Command: other-frame
+ 	Cycle through available frames
+
+Macro ring:
+C-x C-k C-k	Command: kmacro-end-or-call-macro-repeat
+ 	Execute the keyboard macro at the head of the ring
+C-x C-k C-n	Command: kmacro-cycle-ring-next
+ 	Rotate the keyboard macro ring to the next macro
+ 	(defined earlier).
+C-x C-k C-p	Command: kmacro-cycle-ring-previous
+ 	Rotate the keyboard macro ring to the previous macro
+ 	(defined later)
+
+cc-mode:
+C-M-h           c-mark-function
+M-a             c-beginning-of-statement
+M-e             c-end-of-statement
+C-M-n	Closing bracket	.
+C-M-p	Opening bracket	.
+C-M-a	Start of function
+C-M-u   upper conditional - for regular if()
+C-c C-u         c-up-conditional - for #ifdef
+
+______
+ELISP
+------
+
+C-x C-e to evaluate (cursor must be at the end of the form)
+
+(defun my-func ()
+"asdasdasd"
+(interactive)
+(beginning-of-buffer)
+(while (re-search-forward "BLABLABLABLA")
+    (replace-match "PAKAPAKA")))
+
+(message "adsasd")

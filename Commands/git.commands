@@ -1,0 +1,85 @@
+Common Flows
+	Start working on new bug:
+		1. Check in Jira the exact branch name the bug has occurred in (e.g. dev-3.0).
+		2. > git fetch <repo> (e.g. gitolite).
+		3. > git checkout <local remote branch name> (e.g. dev-3.0).
+		4. > git checkout –b <new local branch name (e.g. dev-3.0-SCI-22436)>.
+		5. Make your changes while adding and committing any bunch of related changes together.
+		6. > git push –u <repo> <new remote branch name>
+		7. > git fetch <repo>
+		8. > git merge <repo/branch you want to merge with>
+		9. Fix conflicts
+		10. > git commit (without –m option cause there is an automatically generated one for post merge commits)
+		11. > git push
+		* Maybe by the time you finish fixing conflicts, there has been made changes to remote so maybe you need to repeat stages 6-10.
+
+Common Commands
+	Checkout
+	<name>    Move local HEAD to the most up to date node of the specified branch (can be specified by branch name or hash).
+	-b <branch>    create new branch and move local HEAD to it.
+	<hash> (space) — (space) <path> bring file from another node as is.
+	<branch from> -- <path to file>                 -                 bring file from another branch to current branch.
+	Branch
+	<branch_name>   -   Give a new name to the node HEAD points to.
+	-d <local_branch_name>   -   remove local branch.
+	-r --contains <hash>   -   branches which contain the commit hash
+	Reset <hash>
+	Move the local HEAD to the specified hash.
+	--hard    also change the source tree.
+	HEAD^  (=HEAD~1)
+	Fetch <repo> <branch>
+	Bring objects from remote repo to local-remote from branch.
+	-p    also deletes all the deleted objects from remote in local-remote. 
+	Rebase <remote_branch>
+	Put your changes on top of the remote branch (change the history of my branch, so can't push any more to my branch).
+	Merge <remote_branch>
+	Put remote branch on top of the current branch. Also commits automatically. Doesn't change the history of my branch so it can be pushed afterwards to the remote.
+    Push <repo> <branch>
+        Updates remote with local commits
+	-u    first time pushing to a new remote branch connects the remote to local-remote and tracks the changes on the remote when asking for status. Important!
+    Log (gl for nice coloring)
+	-NUM            last NUM commits.
+	-- (space) <path>    last commits that changed this path.
+	--author <name>    last commits that done by this author.
+	-p --folllow <file_name> | less    --->>>   then find pattern                 find blame history of file (line)
+    Reflog
+	Show history of HEAD pointing.
+    Add <path>
+	Move path to staging area.
+    Commit
+	Move everything from staging area to local.
+	-m    commit massage. Has to be in format: “Component name: bug name: short description”
+	--amend       -       append changes to last commit.
+    Diff
+	git diff $(git merge-base HEAD gitolite/dev-3.0)       -       make diff with the last common commit of current branch and dev-3.0
+	git diff --name-only SHA1 SHA2      -      show difference by file names only
+	 - diff specific file from specific branch
+        git difftool --dir_diff
+    Blame <path>
+	For each line in the file show who last updated.
+    Tag
+	--contains <hash>        check whether the tag contains the fix which was made in the specified hash.
+	Archive <local remote branch>
+	-o <name>    give the .tar file the specified name.
+    Fetch
+	-p    also delete the redundant branches that were removed remotely.
+    Clean
+	-df    delete all non-git files. 
+    Stash
+	Save changes without committing
+	Stash pop    -    return to last snapshot before stashing
+    Cherry-pick
+	-x <Hash from>         -               adds usefull information to the commit message.
+	-n <Hash>                  -               (no commit) don’t commit automatically for each hach specified in the cherry-pick command.
+    Squash
+	Git rebase -i HEAD~<number_of_commits_to_shrink>
+	git rev-parse --short <original_SHA>
+    Gitk
+	gitk <bad new hash> ^<good old hash>^ -- <relative path to directory/file>   ---  check for line existance in history
+	
+ 
+Good Practices
+When renaming a file – do that in a separated commit.
+
+If need to workaround SSL private certificate bla bla...
+    GIT_SSL_NO_VERIFY=1 git fetch -p gitolite

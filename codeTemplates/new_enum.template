@@ -1,0 +1,5 @@
+/* TODO Kopzon - description */
+typedef enum {
+    NONE,
+    LAST
+} enumName, *PenumName;

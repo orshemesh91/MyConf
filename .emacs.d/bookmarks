@@ -1,0 +1,20 @@
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*- 
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("src"
+ (filename . "~/ScaleIO/src/")
+ (front-context-string . "afs\n  drwxrwxr-x")
+ (rear-context-string . "96 Apr  2 11:39 ")
+ (position . 227))
+("src1"
+ (filename . "~/ScaleIO_1/src/")
+ (front-context-string . "afs\n  drwxrwxr-x")
+ (rear-context-string . "96 Mar 31 12:41 ")
+ (position . 229))
+("src2"
+ (filename . "~/ScaleIO_2/src/")
+ (front-context-string . "afs\n  drwxrwxr-x")
+ (rear-context-string . "96 Feb 19 19:44 ")
+ (position . 229))
+)

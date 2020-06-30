@@ -1,0 +1,10 @@
+.emacs.d/auto-save-list/*
+.emacs~
+.aliases~
+GPATH
+GRTAGS
+GTAGS
+TAGS
+.emacs.d/.emacs.desktop*
+.emacs.d/transient/*
+

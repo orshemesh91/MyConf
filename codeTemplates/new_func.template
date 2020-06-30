@@ -1,0 +1,20 @@
+/**
+ * Function Name: funcName
+ *
+ * Description:
+ *   ...
+ *
+ * Parameters:
+ *   ...
+ *
+ * Return:
+ *   ...
+ *
+ * Notes:
+ *   ...
+ *
+ **/
+retValType funcName(...)
+{
+    ...
+}/* End of funcName */

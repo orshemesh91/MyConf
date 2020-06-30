@@ -1,0 +1,20 @@
+Search by file name
+    Ctrl-Shift-R
+
+Search by configurable pattern
+    Ctrl-H
+
+Go to definition
+    F3
+
+Show all references
+    Ctrl-Shift-G
+
+Open call hierarchy
+    Ctrl-Alt-H
+
+Back to previous place
+    Alt-left
+
+Rename refactor
+    Alt+Shift+R

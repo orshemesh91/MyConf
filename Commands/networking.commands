@@ -1,0 +1,92 @@
+_________________________________________
+Connect VM to the internet from scratch.
+-----------------------------------------
+
+On host: share network with Vmware on network adapter settings.
+On guest: generate MAC address, open NAT connection and choose custom NAT.
+Restart Network configurations
+Restart Host VMware NAT and DHCP service (cmd: WinKey-r "services.msc")
+
+Get interface:
+    route (to check how is the gateway interface)
+    ip link show
+Restart interface:
+    sudo ifconfig <interface_name> down
+    sudo ifconfig <interface_name> up
+Request new IP:
+    Sudo dhclient -r <interface_name>
+    Sudo dhclient <interface_name>
+
+On windows: ipcongif/renew
+
+Save network trafic for wireshark
+    tcpdump -i lo -w /tmp/tcpdump.cap port 8000
+
+Check routing access
+    telnet <ip> <port>
+	
+Enable IPV6 on Linux machine:
+	open /etc/default/grub -> Remove "ipv6.disable=1"
+	Rebuild the Grub : 
+		grub2-mkconfig -o /boot/grub2/grub.cfg
+	reboot
+
+
+
+TCP windowing:
+--------------
+
+Maybe relevant information from man tcp:
+
+tcp_window_scaling (Boolean; default: enabled; since Linux 2.2)
+Enable RFC 1323 TCP window scaling. This feature allows the use of a large window (> 64K) on a TCP connection, should the other end support it. Normally, the 16 bit window length field
+in the TCP header limits the window size to less than 64K bytes. If larger windows are desired, applications can increase the size of their socket buffers and the window scaling option
+will be employed. If tcp_window_scaling is disabled, TCP will not negotiate the use of window scaling with the other end during connection setup.
+
+tcp_adv_win_scale (integer; default: 2; since Linux 2.4)
+Count buffering overhead as bytes/2^tcp_adv_win_scale, if tcp_adv_win_scale is greater than 0; or bytes-bytes/2^(-tcp_adv_win_scale), if tcp_adv_win_scale is less than or equal to zero.
+
+The socket receive buffer space is shared between the application and kernel. TCP maintains part of the buffer as the TCP window, this is the size of the receive window advertised to
+the other end. The rest of the space is used as the "application" buffer, used to isolate the network from scheduling and application latencies. The tcp_adv_win_scale default value of
+2 implies that the space used for the application buffer is one fourth that of the total.
+
+
+
+tcp_bic (Boolean; default: disabled; Linux 2.4.27/2.6.6 to 2.6.13)
+Enable BIC TCP congestion control algorithm. BIC-TCP is a sender-side only change that ensures a linear RTT fairness under large windows while offering both scalability and bounded TCP-
+friendliness. The protocol combines two schemes called additive increase and binary search increase. When the congestion window is large, additive increase with a large increment
+ensures linear RTT fairness as well as good scalability. Under small congestion windows, binary search increase provides TCP friendliness.
+
+tcp_bic_low_window (integer; default: 14; Linux 2.4.27/2.6.6 to 2.6.13)
+Set the threshold window (in packets) where BIC TCP starts to adjust the congestion window. Below this threshold BIC TCP behaves the same as the default TCP Reno.
+
+
+
+tcp_moderate_rcvbuf (Boolean; default: enabled; since Linux 2.4.17/2.6.7)
+If enabled, TCP performs receive buffer auto-tuning, attempting to automatically size the buffer (no greater than tcp_rmem[2]) to match the size required by the path for full throughput.
+
+
+
+tcp_rmem (since Linux 2.4)
+This is a vector of 3 integers: [min, default, max]. These parameters are used by TCP to regulate receive buffer sizes. TCP dynamically adjusts the size of the receive buffer from the
+defaults listed below, in the range of these values, depending on memory available in the system.
+
+min: minimum size of the receive buffer used by each TCP socket. The default value is the system page size. (On Linux 2.4, the default value is 4K, lowered to PAGE_SIZE bytes in
+low-memory systems.) This value is used to ensure that in memory pressure mode, allocations below this size will still succeed. This is not used to bound the size of the
+receive buffer declared using SO_RCVBUF on a socket.
+
+default: the default size of the receive buffer for a TCP socket. This value overwrites the initial default buffer size from the generic global net.core.rmem_default defined for all
+protocols. The default value is 87380 bytes. (On Linux 2.4, this will be lowered to 43689 in low-memory systems.) If larger receive buffer sizes are desired, this value
+should be increased (to affect all sockets). To employ large TCP windows, the net.ipv4.tcp_window_scaling must be enabled (default).
+
+max: the maximum size of the receive buffer used by each TCP socket. This value does not override the global net.core.rmem_max. This is not used to limit the size of the receive
+buffer declared using SO_RCVBUF on a socket. The default value is calculated using the formula: max(87380, min(4MB, tcp_mem[1]*PAGE_SIZE/128)). (On Linux 2.4, the default is 87380*2 bytes, lowered to 87380 in low-memory systems).
+
+SO_RCVBUF
+              Sets or gets the maximum socket receive buffer in bytes.  The
+              kernel doubles this value (to allow space for bookkeeping
+              overhead) when it is set using setsockopt(2), and this doubled
+              value is returned by getsockopt(2).  The default value is set
+              by the /proc/sys/net/core/rmem_default file, and the maximum
+              allowed value is set by the /proc/sys/net/core/rmem_max file.
+              The minimum (doubled) value for this option is 256.

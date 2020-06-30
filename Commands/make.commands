@@ -1,0 +1,9 @@
+Automatic variables   ---   https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
+
+When you don't know what to do:
+    copy failed command and paste it without -o flag but with -E flag and pipe to less with -IS flags
+	(<failed_command_without_-o_flag> -E | less -IS)
+
+Dynamic libs:
+    show dynamic libraries of the object: ldd <obj_name>
+    run binary with dynamic lib path (like -L in compile time): LD_LIBRARY_PATH=<dynamic_lib_path> <obj_name>

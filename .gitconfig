@@ -1,0 +1,22 @@
+[http]
+	sslCert = /home/kopzoa/.git_key/kopzoa.pem
+	sslKey = /home/kopzoa/.git_key/kopzoa.key
+	sslVerify = false
+	sslVerify = false
+[user]
+	name = Kopzon
+	email = alexander.kopzon@dell.com
+[diff]
+	tool = kdiff3
+[merge]
+	tool = kdiff3
+	defaultToUpstream = true
+[core]
+	preloadindex = true
+	fscache = true
+	pager =
+	editor = emacs
+[gc]
+	auto = 1024
+[push]
+	default = current
