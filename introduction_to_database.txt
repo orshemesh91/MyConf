@@ -1,0 +1,220 @@
+leacture 1:
+-----------
+-----------
+
+DBMS - database management system - allows definition, creation, querying, update and administration of databases
+DML - data manipulation languages:
+    Procedural (Relational Algebra) - the query specifies the high level strategy the DBMS should use to find the desired result.
+        Relational algebra operators:
+            Select
+            Projection
+            Union
+            Intersection
+            Difference
+            Product
+            Join
+        Extra operators:
+            Rename
+            Assign
+            Aggregate
+            Sort
+            Division
+    Non-Procedural (Declarative) (Relational Calculus) - the query specifies only what data is wanted and not how to find it
+
+
+leacture 2:
+-----------
+-----------
+
+SQL - Structured Query Language
+-------------------------------
+DML - Data Manipulation Language - actions on data
+DDL - Data Definition Language - creating tables
+DCL - Data Control Language - security and permissions
+Aggregates - can only be used in the SELECT output list
+    AVG(col)
+    MIN(col)
+    MAX(col)
+    SUM(col)
+    COUNT(col)
+    example:
+        SELECT COUNT(login) AS cnt FROM student WHERE login LIKE '@sc';
+        SELECT COUNT(*) AS cnt FROM student WHERE login LIKE '@sc';
+        SELECT COUNT(1) AS cnt FROM student WHERE login LIKE '@sc'; TODO Kopzon - why all 3 are the same?
+    GROUP BY
+        Non aggregated values in SELECT output, must appear in GROUP BY clause
+        example:
+            SELECT AVG(s.gpa), e.cid, s.name FROM enrolled AS e, student AS s WHERE e.sid = s.sid GROUP BY e.cid, s.name;
+    HAVING
+        Filters results based on aggregation computation (like WHERE clause for a GROUP BY)
+        example:
+            SELECT AVG(s.gpa) AS avg_gpa. e.cid FROM enrolled AS e, student AS s WHERE e.sid = s.sid GROUP BY e.cid HAVING avg_gpa > 3.9;
+String operations:
+    LIKE
+        % - matches any substring (including empty ones)
+        _ - matches aby one char
+        example SELECT * FROM student AS s WHERE s.login LIKE 'kookoo%bomba_yal'
+    SUBSTRING
+        SELECT SUBSTRING(name,0,5) AS abbrv_name FROM student WHERE sid = 55843
+    UPPER/LOWER
+        SELECT * FROM student as s WHERE UPPER(e.name) LIKE 'KAN%'
+    Concatinate
+        ||
+        +
+        CONCAT(,)
+Date and Time operatiopns:
+    veries in diferent flavores of sequl
+Output redirection:
+    create new table
+        SELECT DISTINCT cid INTO CourseIds FROM ENROLLED;
+    add to existing table
+        INSERT INTO CourseIds (SELECT DISTINCT cid FROM enrolled)
+    ORDER BY <column> [ASC|DESC]
+        SELECT sid FROM enrolled WHERE cid = '15-721' ORDER BY grade DESC, sid ASC (note that grade is not even part of the output)
+    LIMIT <count> OFFSET [offset]
+Window Functions:
+    Like an aggregation but tuples are not grouped into a single output (you get the whole tuple in the output).
+        SELECT ... FUNC-NAME(...) OVER(...) FROM tableName
+        where FUNC-NAME can be:
+            Aggregation functions...
+            ROW_NUMBER() - # of the current row
+            RANK() - order of the current row
+Common table expressions
+    useful to avoid query nasting.
+        WITH cteName (col1, col2) AS (SELECT ...) SELECT * FROM cteName - col1 and col2 and bind to the temp table columns names
+    can be used for recusrions:
+        WITH RECURSIVE cteSource (counter) AS (
+            (SELECT 1)
+            UNION ALL
+            (SELECT counter + 1 FROM cteSource WHERE counter < 10)
+        )
+        SELECT * FROM cteSource;
+
+Memory Management
+-----------------
+Why not using mmap()
+    The OS doesn't know what really does the application do, so swap stalls are very heavy. A good workaround for this issue is:
+        madvice() - tell the OS how you expect to read the pages
+        mlock() - mark memory ranges that cannot be paged out
+        msync() - flush memory
+    still this isn't a good solution for multiple writers. (Full usage - monetDC, LMDB, ravenDB, levelDB elasticsearch)
+    OS is general purpose track, while our system is a Porche or Ferrari
+    TODO Kopzon - managing our own file system in a big pain in the ass and can give not more than 10% performance enhancement. (is it true?)
+Design
+    Page contains unique sort of data (tuples, meta-data, indexes, log records...)    
+    indirection layer to map page id to file and offset.
+    DB page size is 512B-16KB (ORACLE, IBM DB2 and SQLite - 4KB) (MySQL - 16KB high end) high end systems usually give choice with DB page size per type
+    Hardware pages are 4KB atomic
+    page directory - lookup table for pages on disk
+    page contents:
+        Header:
+            page size
+            checksum
+            BDMS version
+            Transaction visibility TODO Kopzon - what is it?
+            Compression info
+        Slot array - mapping layer from a slot to a tuple (slot array growing from beginning to the end and tuples grow from end to beginning)
+        tuples
+    GC compacts the tuples in a page
+    tuple contents:
+        header
+        attributes
+    normalization - the way you split up the DB across different tables
+    denormalization - pre joining - create a join table instead of two tables (cloud spanner from Google - protobuf nested tables use denormalization)
+    
+
+leacture 3:
+-----------
+-----------
+
+leacture 4:
+-----------
+-----------
+
+leacture 5:
+-----------
+-----------
+
+leacture 6:
+-----------
+-----------
+
+leacture 7:
+-----------
+-----------
+
+leacture 8:
+-----------
+-----------
+
+leacture 9:
+-----------
+-----------
+
+leacture 10:
+-----------
+-----------
+
+leacture 11:
+-----------
+-----------
+
+leacture 12:
+-----------
+-----------
+
+leacture 13:
+-----------
+-----------
+
+leacture 14:
+-----------
+-----------
+
+leacture 15:
+-----------
+-----------
+
+leacture 16:
+-----------
+-----------
+
+leacture 17:
+-----------
+-----------
+
+leacture 18:
+-----------
+-----------
+
+leacture 19:
+-----------
+-----------
+
+leacture 20:
+-----------
+-----------
+
+leacture 21:
+-----------
+-----------
+
+leacture 22:
+-----------
+-----------
+
+leacture 23:
+-----------
+-----------
+
+leacture 24:
+-----------
+-----------
+
+leacture 25:
+-----------
+-----------
+
+leacture 26:
+-----------
+-----------
