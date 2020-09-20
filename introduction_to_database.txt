@@ -135,6 +135,7 @@ How the DBMS represents the DB in files on disk?
     Transaction types:
         OLTP - Online transaction processing - simple mostly write queries, small amount of data involved
         OLAP - Online analytical processing - complex mostly read queries, large amount of data
+        HTAP - Hybrid transactional analytical processing
     mongoDB, bigTable and kasandra are OLTP optimized and are noSQL systems and this is why the are able to scale TODO Kopzon - why and what does it mean?
     storage models:
         n-ary (row store) - all the attributes of a single tuple are stored continuesly in a single page - best for OLTP workloads
@@ -142,8 +143,27 @@ How the DBMS represents the DB in files on disk?
             fixed length offsets - issue with variable length attributes
             embedded tuple ids - waste of space
         get 4KB page from SSD - 150micro, scan 4KB in INT32 jumps is 33micro (3Ghz processor, 10clock cycles per loop)? TODO Kopzon - check
-    
+        It is a common solution to store the DB with a row transactional store (OLTP) for real time transaction based applications and when the data starts to be less relevant (in time for example) it is copied to a backend column analytical store (OLAP).
+
 How the DBMS manages it's memory and moves data back and forth from disk?
+    allocate a memory region called buffer cache (frame pool) and bring needed pages from dist to it.
+    Use page table to map page to frame in the pool.
+    save dirty and reference bits on frames to control correct swapping.
+    lock - high level transaction syncronization mechanism (should be able to roll back transactions etc...)
+    latch - low level lock for protecting data resources from multi-threaded corruption.
+    page directory - where is the page in the disk (must be durable)
+    page table - where is the page in the buffer pool (don't have to be durable)
+    pre-fetching - OS prefetchs pages using simple locality heuristic. The DBMS can pre-fetch non-sequential pages based on table indexes and query requirements.
+    scan sharing - allow multiple queries attach to a single table cursor that scans the table. (queries don'thave to be exactly the same)
+    result caching - save query result in cache to output it on demand for the same query in the future
+    buffer cache bypass - for sort/ large sequential queries - allocate temporary memory for pages for the specific query to reduce buffer cache cooling (with regard to other queries that use the buffer cache and made it "hot" for them)
+    most DBMS use O_DIRECT (direct IO) to avoid using the OS page cache.
+    page replacement policy
+        LRU
+            time stamp per page in page table + scan all pages in page table vor every page removal operation (wase of time to iterrate)
+            queue - add to the end, remove from the beginning + reinsert all pages that are reused (the queue lock is contended)
+        clock - approximation of LRU - hold all pages in a cyrcular buffer. if page is referenced, update bRef to 1. when page should be swapped out the if the clock arrow points to a page with bRef = 1, assign bRef = 0 and go to the next one, otherwise swap this page.
+        
     
 
 leacture 3:
