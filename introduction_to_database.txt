@@ -100,7 +100,8 @@ Why not using mmap()
     still this isn't a good solution for multiple writers. (Full usage - monetDC, LMDB, ravenDB, levelDB elasticsearch)
     OS is general purpose track, while our system is a Porche or Ferrari
     TODO Kopzon - managing our own file system in a big pain in the ass and can give not more than 10% performance enhancement. (is it true?)
-Design
+
+How the DBMS represents the DB in files on disk?
     Page contains unique sort of data (tuples, meta-data, indexes, log records...)    
     indirection layer to map page id to file and offset.
     DB page size is 512B-16KB (ORACLE, IBM DB2 and SQLite - 4KB) (MySQL - 16KB high end) high end systems usually give choice with DB page size per type
@@ -113,14 +114,36 @@ Design
             BDMS version
             Transaction visibility TODO Kopzon - what is it?
             Compression info
-        Slot array - mapping layer from a slot to a tuple (slot array growing from beginning to the end and tuples grow from end to beginning)
-        tuples
+        1st option:
+            Slot array - mapping layer from a slot to a tuple (slot array growing from beginning to the end and tuples grow from end to beginning)
+            Tuples
+        2nd option:
+            Log structured - Append records to a log file when DB is modified. (good for writes, bad for reads, but you can periodically build indexes and compact logs)
+                Insert - store the entire tuple
+                Delete - mark the tupl as deleted
+                Update contain the delta of the modified attribute
     GC compacts the tuples in a page
     tuple contents:
         header
         attributes
+        BLOB - Binary Large OBject - is a tuple which's content is too big. Can be handles by:
+            few pages with indirection (like a list of pages)
+            within an external file (DBMS can't manipulate these files)
     normalization - the way you split up the DB across different tables
     denormalization - pre joining - create a join table instead of two tables (cloud spanner from Google - protobuf nested tables use denormalization)
+    Table schema - meta data of a table in the DB (can sit inside the DB itself or rely on external FS)
+    Transaction types:
+        OLTP - Online transaction processing - simple mostly write queries, small amount of data involved
+        OLAP - Online analytical processing - complex mostly read queries, large amount of data
+    mongoDB, bigTable and kasandra are OLTP optimized and are noSQL systems and this is why the are able to scale TODO Kopzon - why and what does it mean?
+    storage models:
+        n-ary (row store) - all the attributes of a single tuple are stored continuesly in a single page - best for OLTP workloads
+        DSM (column store) - Decomposition Storage Model - best for OLAP workloads (analytics). How do we match different attributes of sam tuple?
+            fixed length offsets - issue with variable length attributes
+            embedded tuple ids - waste of space
+        get 4KB page from SSD - 150micro, scan 4KB in INT32 jumps is 33micro (3Ghz processor, 10clock cycles per loop)? TODO Kopzon - check
+    
+How the DBMS manages it's memory and moves data back and forth from disk?
     
 
 leacture 3:
