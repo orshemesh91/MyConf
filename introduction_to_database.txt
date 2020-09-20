@@ -162,8 +162,23 @@ How the DBMS manages it's memory and moves data back and forth from disk?
         LRU
             time stamp per page in page table + scan all pages in page table vor every page removal operation (wase of time to iterrate)
             queue - add to the end, remove from the beginning + reinsert all pages that are reused (the queue lock is contended)
-        clock - approximation of LRU - hold all pages in a cyrcular buffer. if page is referenced, update bRef to 1. when page should be swapped out the if the clock arrow points to a page with bRef = 1, assign bRef = 0 and go to the next one, otherwise swap this page.
-        
+            clock - approximation of LRU - hold all pages in a cyrcular buffer. if page is referenced, update bRef to 1. when page should be swapped out the if the clock arrow points to a page with bRef = 1, assign bRef = 0 and go to the next one, otherwise swap this page. (no need for taking lock on cache hit, just update bRef)
+            note:
+                sequential flooding - cache trashing on one sequential query
+        LRU-K
+            track the lask K references to each page and remove from cache the one with the biggest AVG interval between timestamps
+        Localization per query - hold page cache per query and not a global one
+        Priority Hints - knowing the query structure we can save in cache the most frequently needed pages for the query
+
+Hash Tables:
+    Linear Search - on collision put the new key at the first available slot after it's optimal slot.
+        Robin Hood hashing - each inserted key stores it's distance from it's optimal slot, and if new key's distance is greater then the old in the slot, they are swapped.
+        CuKoo Hashing - multiple hash functions and hash tables. insert to the hash that doesn't have a collision. If there is a collision, replace the old key and reinsert it to another hash. Do it in a loop till you reinsert all key's or recognize you need to extent the hash table size.
+        In case of resize we have to rebuild the entire table
+    Chain hashing - each entry maps to a bucket of keys.
+    Extendible hashing - Like chain hashing, but the pointers table  has a global counter that represents the amount of  bits to we have to look at when searcing for bucket (page) with data. When a bucket is getting full, we split only this bucket, double the pointer's table size, increasing the global bit counter and update the pointers (updating only 3 pages for resize)
+    Linear haashing - splitting buckets based on the split pointer, double the slot array, add new hash function with modulo X2 from the previous hash function and remove the old hash function when the split pointer gets to the end of the slot array. To find a key use the first hash function and if the result is above the split pointer we may need to use the second hash function. split pointer can move back and slot arary can shrink by two when a splitted bucket gets empty
+    
     
 
 leacture 3:
