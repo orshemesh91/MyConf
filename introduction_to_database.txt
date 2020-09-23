@@ -178,6 +178,40 @@ Hash Tables:
     Chain hashing - each entry maps to a bucket of keys.
     Extendible hashing - Like chain hashing, but the pointers table  has a global counter that represents the amount of  bits to we have to look at when searcing for bucket (page) with data. When a bucket is getting full, we split only this bucket, double the pointer's table size, increasing the global bit counter and update the pointers (updating only 3 pages for resize)
     Linear haashing - splitting buckets based on the split pointer, double the slot array, add new hash function with modulo X2 from the previous hash function and remove the old hash function when the split pointer gets to the end of the slot array. To find a key use the first hash function and if the result is above the split pointer we may need to use the second hash function. split pointer can move back and slot arary can shrink by two when a splitted bucket gets empty
+
+B-Trees:
+    The main difference between B-Tree and a B+Tree is in B-Tree there are no duplicates of keys (data is all over the tree and not only in leaves) so it is more compact, but it is not used since it is much more efficient to multi-thread over B+Tree (data in only in leaves so taking latch will not block other leaves from being updated)
+    why B+trees are better than hash tables for indexing?
+        tuples are sorted in the key order on disk - range queries are faster and require less page accesses.
+        can do a partial key search (wild card searches e.g <A,*>)
+    variable key sizes - use in-page indirection table that grows from the beginning of the node (page) while the key values + data themselves grow from the end (like  a slot array) nice trick - save the first character of the real key in the slot array entries to avoid ram cache garbeging and redundent lookups.
+    node optimizations:
+        prefix compression - most of the keys in a leaf are very similar (at least same prefix), so there is no point in storing the common prefix multiple times
+        suffix truncation - in the inner nodes of the B+Tree we can store only some prefix which is just enough to navigate threw the tree
+        bulk insert - if you have all the keys ahead of time you can sort them and build a B+Tree from buttom to up
+        pointer swizzling - if a page is pinned, store the direct pointer to a frame in the buffer cache instead of the page id to reduce page table access
+    non-unique keys:
+        can be handled "as usual" - reorder the relevant page and split if needed
+        use an "overflow page". This overflow page can be sorted (slower to insert and maintain) or unordered.
+    Partial indexes - can save partial key set - optimizes specific queries
+    Covering index - can save partial tuple data inside the index itself - to avoid indirection to the tuple itself
+    Index include columns - add some attributes to a Covering index
+    Functional/Expression index - like a partial index build on some function or expression over the attributes (not the attribute itself)
+
+Trie:
+    used to determine whether a key exists or not to avoid searching by the index and potentially get multiple page misses
+    Trie is faster for point queries, B+ faster for scans
+    horizontal compression - remove the values from the inner nodes, store only the pointers (the values order in each node's array is a predefined known convention you define)
+    vertical compression - if there is only one key for some prefix, don't save the whole path till the end of the key string, point to the corresponding tuple immediately.
+    Radix tree - Trie with vertical and horizontal compression.
+
+Inverted index (full-text search index):
+    stores a mapping of words to records that contain those words in the target attribute.
+
+Multi-threeading:
+    OS mutex - is ~30ns for each acquire and release. It tries to test and set at the user space (futex) and if fails goes to the kernel mutex which reschedules the whole thread.
+    std::atomic_flag latch - can use "while (latch.test_and_set()) { /*retry? yield? abort?*/ }" to have more control over the multi threading in the system
+    
     
     
 
