@@ -208,10 +208,11 @@ Trie:
 Inverted index (full-text search index):
     stores a mapping of words to records that contain those words in the target attribute.
 
-Multi-threeading:
+Multi-threading:
     OS mutex - is ~30ns for each acquire and release. It tries to test and set at the user space (futex) and if fails goes to the kernel mutex which reschedules the whole thread.
     std::atomic_flag latch - can use "while (latch.test_and_set()) { /*retry? yield? abort?*/ }" to have more control over the multi threading in the system
-    
+    Hash table - lock the entry you need, in linear search collision case lock the next node and release the previous. may first lock for read only the check whether the node contains the key we need and only if yes to take a write lock.
+    B+Tree - latch crabbing/coupling - get parent latch, get child latch, release parent latch if safe (node not full on "add" node not half full at "delete") - use a stack of latches (queue is better from performance stand point). Same as in Hash tables, first use a read latch and only if we got to the leaf node (which takes a write latch) and it has to do a rebalance operation, only then re-take the needed write latches on the relevant parents.
     
     
 
