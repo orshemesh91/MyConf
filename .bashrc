@@ -93,3 +93,4 @@ for brch in $(git branch -r | grep -i $2); do
     fi;
 done
 }
+source scl_source enable devtools-8 llvm-toolset-7.0
