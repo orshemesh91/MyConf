@@ -1,6 +1,14 @@
-leacture 1:
------------
------------
+Introduction
+------------
+
+Storage access times:
+    L1 cache - 0.5 ns
+	L2 cache - 7 ns
+	DRAM -  100 ns
+	SSD - 150,000 ns = 150 micro sec
+	HDD - 10,000,000 ns = 10 milli sec
+	Network storage - 30,000,000 ns = 30 milli sec
+	tape archives - 1,000,000,000 ns = 1 sec
 
 DBMS - database management system - allows definition, creation, querying, update and administration of databases
 DML - data manipulation languages:
@@ -20,11 +28,6 @@ DML - data manipulation languages:
             Sort
             Division
     Non-Procedural (Declarative) (Relational Calculus) - the query specifies only what data is wanted and not how to find it
-
-
-leacture 2:
------------
------------
 
 SQL - Structured Query Language
 -------------------------------
@@ -139,7 +142,7 @@ How the DBMS represents the DB in files on disk?
     mongoDB, bigTable and kasandra are OLTP optimized and are noSQL systems and this is why the are able to scale TODO Kopzon - why and what does it mean?
     storage models:
         n-ary (row store) - all the attributes of a single tuple are stored continuesly in a single page - best for OLTP workloads
-        DSM (column store) - Decomposition Storage Model - best for OLAP workloads (analytics). How do we match different attributes of sam tuple?
+        DSM (column store) - Decomposition Storage Model - best for OLAP workloads (analytics). How do we match different attributes of same tuple?
             fixed length offsets - issue with variable length attributes
             embedded tuple ids - waste of space
         get 4KB page from SSD - 150micro, scan 4KB in INT32 jumps is 33micro (3Ghz processor, 10clock cycles per loop)? TODO Kopzon - check
@@ -188,7 +191,7 @@ B-Trees:
     node optimizations:
         prefix compression - most of the keys in a leaf are very similar (at least same prefix), so there is no point in storing the common prefix multiple times
         suffix truncation - in the inner nodes of the B+Tree we can store only some prefix which is just enough to navigate threw the tree
-        bulk insert - if you have all the keys ahead of time you can sort them and build a B+Tree from buttom to up
+        bulk insert - if you have all the keys ahead of time you can sort them and build a B+Tree from buttom to up(top) it is much faster (O(n) and not O(n*log(n))
         pointer swizzling - if a page is pinned, store the direct pointer to a frame in the buffer cache instead of the page id to reduce page table access
     non-unique keys:
         can be handled "as usual" - reorder the relevant page and split if needed
@@ -213,101 +216,40 @@ Multi-threading:
     std::atomic_flag latch - can use "while (latch.test_and_set()) { /*retry? yield? abort?*/ }" to have more control over the multi threading in the system
     Hash table - lock the entry you need, in linear search collision case lock the next node and release the previous. may first lock for read only the check whether the node contains the key we need and only if yes to take a write lock.
     B+Tree - latch crabbing/coupling - get parent latch, get child latch, release parent latch if safe (node not full on "add" node not half full at "delete") - use a stack of latches (queue is better from performance stand point). Same as in Hash tables, first use a read latch and only if we got to the leaf node (which takes a write latch) and it has to do a rebalance operation, only then re-take the needed write latches on the relevant parents.
-    
-    
+    Lazy parent updates in B+Trees - have a global table with inner nodes that have to be updated due to previous splits. the split command only creates the new node and links it to the sibling leaf. only the next command that will get the parent's lock will update it. TODO Kopzon - so now we have to create another if statement on every inner node?!?
+	Sibling pointer latches should kill the operation if stuck due to colission with vertical latches to avoid deadlocks.
+	
+JOIN Algorithms:
+    Operator output:
+	    data - save a brand new tuple with the needed attributes from the joined tables (can be optimized to filter out the redundant attributes if they are known from the query itself)
+        record id (late materialization) - save a tuple with page id and record id (pointers) (not good for high scale systems)
+    Nested Loop algorithm - if memory has B free blocks then bring B-2 blocks from the outer relation to memory and scan threw the inner relation blocks one by one (ont block for input and one for output). This one is mostly used when one of the relations fits the RAM
+    Sort-Merge Algorithm - first sort the relations and then merge them (may need backtrack on the inner relation (save pointer of the first time you saw a value when incrementing the inner relation pointer))
+	    If the relation has an index that already sorted we don't have to do the sort phase.
+	    If we have an ORDER BY clause on the same attribute, then the JOIN's sorting operation output can be used for the ORDER BY calculation
+	Hash Algorithm - put both relations to a hash table by same hash function (first the outer relation then the inner). then go over the buckets and output the join.
+        optimization - build a bloom filter when creating the outer hash table.
+            bloom filter - "one way" filter - lookup bit map which supports insert() and lookup() API.
+        recursive partitioning - if a partition (buket of outer and inner relations) doesn't fit memory, the do another loop of hash with another hash function
 
-leacture 3:
------------
------------
+Query Plan:
+	Processing model:
+        Iterator model (pipeline) - for each query operator we implement a next() function. Each tuple is propagated threw all query functions in a pipeline. Good for OLAP data model - complex read queries can be processed in pipeline giving a high threughput with relatively low memory consumption.
+        Materialization model - each operator processes all tuples at once and outputs all at once. Can use hints from the DBMS to optimize per query. Good for OLTP data model - small amount of tuples involved so using smaller amount of functions invocations and branches. Good for in-memory systems.
+        Vectorization model - like Iterator model but instead of each tuple propagate a block of tuples at once (batch processing). Best for OLAP
+    Sequential scan optimizations:
+        Prefetching
+		Buffer pool bypass
+		Paralleization
+		Zone maps - for each page save a meta data (in the page itself or in another dedicated page) that gives hints which help queries not access pages they don't need. Good for OLAP since they mostly don't update the tuples and so don't have to update the zone maps syncroniousely all the time
+		Late materialization - delay stiching togather tuples untill the upper part of the query plan - passing only offsets (pointers) if the upper parts don't really need the aggregation attribute from the lower parts.
+		Heap clustering - use sorted indexes where able to
+	Index scan:
+        scan threw an index (can by multiple indexes and then an intersention or union between them). The DBMS Optimizer decides whether to use index or sequential scan.
+        if the index is unclustered, first figure out all the tuples needed for the query, sort them by their page id and then bring them to memory by their page id order to avoid buffer cache garbeging
+    Expression trees are the high level query plan. They are flexible but slow. High end systems know to take a query template, parameters for it and compile down at run time the query plan code to a dedicated function instead of having a bunch of generic functions with multiple switch case statements that match all tupes of queries.
 
-leacture 4:
------------
------------
-
-leacture 5:
------------
------------
-
-leacture 6:
------------
------------
-
-leacture 7:
------------
------------
-
-leacture 8:
------------
------------
-
-leacture 9:
------------
------------
-
-leacture 10:
------------
------------
-
-leacture 11:
------------
------------
-
-leacture 12:
------------
------------
-
-leacture 13:
------------
------------
-
-leacture 14:
------------
------------
-
-leacture 15:
------------
------------
-
-leacture 16:
------------
------------
-
-leacture 17:
------------
------------
-
-leacture 18:
------------
------------
-
-leacture 19:
------------
------------
-
-leacture 20:
------------
------------
-
-leacture 21:
------------
------------
-
-leacture 22:
------------
------------
-
-leacture 23:
------------
------------
-
-leacture 24:
------------
------------
-
-leacture 25:
------------
------------
-
-leacture 26:
------------
------------
+TCO - Total Cost of Ownership - hardwre + sofrware + run time + maintenence + .....
+Parallel vs distributed:
+    Parallel is multithreading/multiresources on a single machine
+    Distributed is across multiple servers
