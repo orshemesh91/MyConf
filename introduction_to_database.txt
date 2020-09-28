@@ -250,6 +250,20 @@ Query Plan:
     Expression trees are the high level query plan. They are flexible but slow. High end systems know to take a query template, parameters for it and compile down at run time the query plan code to a dedicated function instead of having a bunch of generic functions with multiple switch case statements that match all tupes of queries.
 
 TCO - Total Cost of Ownership - hardwre + sofrware + run time + maintenence + .....
+
 Parallel vs distributed:
     Parallel is multithreading/multiresources on a single machine
     Distributed is across multiple servers
+Processing parallelizm:
+    inter query
+    intra query
+        inter operator
+		intra operator
+    exchange operator - inner DBMS operation which is responsible of gathering data together after multi-threaded execution.
+storage parallelizm:
+    basically the DBMS doesn't care about it and sits on anpther layer that controls the storage (e.g raid controller). The DBMS just controls the logical partitioning
+        horizontal partitioning - sharding - different tupples of same table on different storage devices
+	    vertical partitioning - different attributes on different storage devices
+
+Query optimization:
+    
