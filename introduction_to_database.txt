@@ -266,4 +266,57 @@ storage parallelizm:
 	    vertical partitioning - different attributes on different storage devices
 
 Query optimization:
-    
+    rewrite the query to avoid redundant parts, estimate a cost of different possible query plans and choose the "cheepest" one.
+    Predicate pushdown - move filters closer to the buttom of the evaluation tree (only f the filtering operation is cheeper than other operations in the query - which is mostly like this).
+    Reorder filters from the most filtering to the least.
+	Projection pushdown - don't propagate redundant data.
+    Remove imposible/redundant predicates
+	Join elimination - if both tables in the JOIN operation are evaluating to the same table
+	Ignoring projections - TODO Kopzon leacture 14 39:45
+    Merging predicates of the same attribute
+
+Execution plan choose:
+	MongoDB runs a lot of query plans in parallel, returns the output of the first that returns and saves this plan for this query in a catalog, so next time this query is invoked, the DBMS will know which plan to execute. When the table changes more than by 10%, the cached plan is removed and next time the query will be invoked it will run again multiple plans to check if there is a better one (simple but working heuristic).
+    System catalog - saves metadata about the tables, indexes and statistics for different optomizations. ANALYZE - system statistics builder - can be run at night to update the histograms and catalog but not colide with user queries
+	    Attribute correlated data - maintain attribute correlation to estimate query plan cost more efficiently. high end systems have it
+	    Histogram unique value occurence - per table, per attribute save an histogram that shows how much ocurences each value has. high end system have it
+	    Sampling - have a smaller selective table (e.g only 1 from each 10 tuples) and assume the selectivities are similar to the original table
+
+Concurency control:
+    MySQL doesn't do transactions to be faster.
+	ACID:
+        Atomicity:
+            trx finishes with commit or abort
+            Logging - 
+            Shadow paging - make a copy of every page the trx changes and arite them only at the trx commit. TODO Kopzon - how multiple page writes can be atomic? (old IBM approach)
+        Consistency:
+			trx consistency 
+                later trxs see results of older trxs (app responsibility).
+		    data base consistency
+                database follows integrity constraints (models the real world). If DB is consistent before a trx then it is consistent after it commits or aborts.
+					Pasimistic approach - don't let problems arise in teh first place
+                    Optimistic approach - assume conflicts are rare and deal with them after they happen
+                    If transaction preserves consistency, every serializable schedule preserves consistency. DB ensures that resulting execution of trxs is equivalent to some serial execution of the trxs 
+                    View serializability - 
+                        weaker demand then conflict serializability but much harder to verify and DBs don't really implement it.
+                        for each conflicted resource A of trxs T1 and T2, schedules S1 and S2 are view equivalent if in both schedules:
+                            the two trxs read the same initial value
+                            T1 sees T2.write(A) and vice versa
+                            final value  of A is written by the same trx
+                    How to know is an execution schedule is correct without knowing the entire schedule ahead of time
+                        2PL - concurency control protocol which guarantee conflict serialivability but is also subject to cascading aborts and limits concurency since guaranties more than needed (gives conflict serializability while needed only view serializability).
+                            in which there are two phases:
+                                take locks
+                                execute trx ops and release locks
+                            Strict 2PL (solves cascading aborts) - release all locks only at the very end of the transaction
+                            Deadlocks prevention:
+                                detection - create a "wait for" graph of trxs and periodically check for cycles in that graph. then decide how to break the cycle (choose victim, abort or partial rollback).
+                                prevention - kill emidiatelly one of the trxs when conflict arises.
+                    Lock types:
+                        Shared - tuple read
+                        Exclusive - tuple write
+                        Intensive Shared - tuple aggregation unit locked and all children of it are locked for read
+                        Intencive Exclusive - tuple aggregation unit locked and all children of it are locked for write
+                        Shared Intencive Exclusive - tuple aggregation unit locked and all children of it are locked for read while some are locked also for wtire
+        Isolation:
+        Durability
