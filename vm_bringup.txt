@@ -1,0 +1,105 @@
+Steps for VM setup
+==================
+-Download the CentOS image (Minimal ISO): https://www.centos.org/download/
+
+-Create a new VM via virtualbox:
+	 Type: Linux.
+	 Version Redhat 64bits.
+	 Memory: Minimum 8G, Recommended 16G
+         CPU: At least 4 CPUs, 6 Recommended, 100% execution capacity.
+	 Create a virtual disk now: VDI. Dynamically allocate. Size 64GB (At least)
+
+ NOTE: The resource requirements above are prerequisites for a successful pass 
+       of regression tests.
+
+-Goto the new machine. Right click on it and choose settings.-> storage.
+	-On the ID controller, choose to add a new optical disk -> choose disk -> direct to the image you downloaded
+	-Networks - Add a local host adapter (which will allow easy login)
+-Start the machine
+
+-Choose install CentOS 7
+
+-Install the OS. Language english
+
+-In the next screen, Choose installation destination than done (this will confirm automatic partitioning).
+
+-Choose start
+
+-Setup root password
+
+-Create your own user
+
+-Wait for install to complete
+
+-When install finishes, click reboot
+
+-To login you will need your local IP. Login via the console, use the ip command to see your ip.
+
+-It might be that one of your network interfaces is down. Make sure it starts
+on boot by editing the relevant file in /etc/sysconfig/network-scripts/ifcfg-<interfacename> (Probably enp0s3) and set ONBOOT to YES
+
+-Make yourself root, and install required packages:
+ -yum install -y epel-release
+ -yum install -y centos-release-scl
+ -yum install -y devtoolset-8 llvm-toolset-7.0 make libaio-devel libnuma-devel libuuid-devel valgrind-devel git cmake3 man-pages-overrides man-pages doxygen openssl-devel openssl llvm-toolset-7.0-git-clang-format.x86_64 devtoolset-7.0-libasan-devel.x86_64 xorg-x11-xauth xorg-x11-fonts-* xorg-x11-font-utils xorg-x11-fonts-Type1 llvm-toolset-7.0-clang-analyzer cppcheck wget
+
+-Go to your user, add the following line to your .bashrc file
+ source scl_source enable devtoolset-8 llvm-toolset-7.0
+ -Alternatively, just do that:
+ echo "source scl_source enable devtoolset-8 llvm-toolset-7.0" >> ~/.bashrc
+
+-install protobuf for PDBG:
+ -yum install protobuf-devel.x86_64
+
+- Setup gtest: run ./setup_gtest.sh in the rdb repository root directory
+  NOTE: It performs sudo at some stage, might ask for password TODO Kopzon
+
+Set vm time using NTP:
+ -yum install chrony
+ -timedatectl set-timezone Asia/Jerusalem
+ -timedatectl set-ntp yes
+ -systemctl restart chronyd
+
+BareCTF:
+ - Install pip3: sudo python3.6 -m ensurepip
+ - Install barectf: sudo python3.6 -m pip install barectf
+
+Persistent ulimit configuration:
+ - As a privileged user edit /etc/security/limits.conf and set up unlimited core
+   file size and memory pinning. Add these FOUR lines to the file:
+*		 soft	 core		 unlimited
+*		 hard 	 core		 unlimited
+*		 soft	 memlock	 unlimited
+*		 hard	 memlock	 unlimited
+
+ - Reboot the machine afterwards for the settings to apply.
+
+
+
+
+
+Full Screen issue:
+Open /etc/default/grub with your favorite editor as root.
+
+Localize the line that says GRUB_GFXMODE= ... and change it to the resolution you want. Add another line for a new variable called GRUB_GFXPAYLOAD with the same resolution. It should look similar to this:
+
+GRUB_GFXMODE=1440x900x32
+GRUB_GFXPAYLOAD=1440x900x32
+
+Save and exit. Then edit as root /etc/grub.d/00_header
+
+Localize the line that says if [ "x${GRUB_GFXMODE}" = "x" ] ; then GRUB_GFXMODE=... . As before, change the resolution there to the one you want and add another line for payload:
+
+if [ "x${GRUB_GFXMODE}" = "x" ] ; then GRUB_GFXMODE=1440x900x32 ; fi
+if [ "x${GRUB_GFXPAYLOAD}" = "x" ] ; then GRUB_GFXPAYLOAD=1440x900x32 ; fi
+
+Finally, locate the line that says set gfxmode=${GRUB_GFXMODE} and add a line for payload below it. It should look like this:
+
+set gfxmode=${GRUB_GFXMODE}
+set gfxpayload=${GRUB_GFXPAYLOAD}
+
+Save and exit.
+
+Still as root, refresh grub with
+
+update-grub2

@@ -303,8 +303,8 @@ Concurency control:
                             the two trxs read the same initial value
                             T1 sees T2.write(A) and vice versa
                             final value  of A is written by the same trx
-                    How to know is an execution schedule is correct without knowing the entire schedule ahead of time
-                        2PL - concurency control protocol which guarantee conflict serialivability but is also subject to cascading aborts and limits concurency since guaranties more than needed (gives conflict serializability while needed only view serializability).
+                    How to know is an execution schedule is correct without knowing the entire schedule ahead of time?
+                        2PL (pasimistic) - concurency control protocol which guarantee conflict serialivability but is also subject to cascading aborts and limits concurency since guaranties more than needed (gives conflict serializability while needed only view serializability).
                             in which there are two phases:
                                 take locks
                                 execute trx ops and release locks
@@ -312,6 +312,7 @@ Concurency control:
                             Deadlocks prevention:
                                 detection - create a "wait for" graph of trxs and periodically check for cycles in that graph. then decide how to break the cycle (choose victim, abort or partial rollback).
                                 prevention - kill emidiatelly one of the trxs when conflict arises.
+                        T/O (Timestamp Ordering - optimistic) - 
                     Lock types:
                         Shared - tuple read
                         Exclusive - tuple write
