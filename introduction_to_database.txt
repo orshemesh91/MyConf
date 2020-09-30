@@ -294,8 +294,6 @@ Concurency control:
                 later trxs see results of older trxs (app responsibility).
 		    data base consistency
                 database follows integrity constraints (models the real world). If DB is consistent before a trx then it is consistent after it commits or aborts.
-					Pasimistic approach - don't let problems arise in teh first place
-                    Optimistic approach - assume conflicts are rare and deal with them after they happen
                     If transaction preserves consistency, every serializable schedule preserves consistency. DB ensures that resulting execution of trxs is equivalent to some serial execution of the trxs 
                     View serializability - 
                         weaker demand then conflict serializability but much harder to verify and DBs don't really implement it.
@@ -303,7 +301,8 @@ Concurency control:
                             the two trxs read the same initial value
                             T1 sees T2.write(A) and vice versa
                             final value  of A is written by the same trx
-                    How to know is an execution schedule is correct without knowing the entire schedule ahead of time?
+					Pasimistic approach - don't let problems arise in teh first place
+                        How to know is an execution schedule is correct without knowing the entire schedule ahead of time?
                         2PL (pasimistic) - concurency control protocol which guarantee conflict serialivability but is also subject to cascading aborts and limits concurency since guaranties more than needed (gives conflict serializability while needed only view serializability).
                             in which there are two phases:
                                 take locks
@@ -312,12 +311,35 @@ Concurency control:
                             Deadlocks prevention:
                                 detection - create a "wait for" graph of trxs and periodically check for cycles in that graph. then decide how to break the cycle (choose victim, abort or partial rollback).
                                 prevention - kill emidiatelly one of the trxs when conflict arises.
-                        T/O (Timestamp Ordering - optimistic) - 
-                    Lock types:
-                        Shared - tuple read
-                        Exclusive - tuple write
-                        Intensive Shared - tuple aggregation unit locked and all children of it are locked for read
-                        Intencive Exclusive - tuple aggregation unit locked and all children of it are locked for write
-                        Shared Intencive Exclusive - tuple aggregation unit locked and all children of it are locked for read while some are locked also for wtire
+                            Lock types:
+                                Shared - tuple read
+                                Exclusive - tuple write
+                                Intensive Shared - tuple aggregation unit locked and all children of it are locked for read
+                                Intencive Exclusive - tuple aggregation unit locked and all children of it are locked for write
+                                Shared Intencive Exclusive - tuple aggregation unit locked and all children of it are locked for read while some are locked also for wtire
+                    Optimistic approach - assume conflicts are rare and deal with them after they happen
+                        Basic T/O (Timestamp Ordering) - use timestamps to determine the serializability order of txns. each tuple should have two timestamps one for the most recent read and one for the most recent write. then old TS txn gets aborted if it tries to read or write a value "from the future"
+                            high overhead from copying data to txn's workspace and from updating timestamps
+                            long txns can be starved
+                        OCC - Optimistic concurrency control:
+                            Read phase - read all tuples the txn needs and save in local worspace of the txn
+                            Validate phase - when txn commits check whether it conflicts with other txns. the txn gets a timestamp only at this phase.
+                                validation is the bottleneck of the protocol, it needs latches to be consistent
+                            Write phase - if validation succeeds apply private changes to database, otherwise abort the txn
+                        Partition-based T/O - divide the DB horizontally into partitions - good for workloads that needs txns that manipulate within a single partition. no need for data copying since only one txn can run insode a partition. abort if partition lock is held by other.
+                    MVCC - Multi-Version concurency control - assign timestamps only on writes and maintain virtual snapshots of the whole DB. 
+                        CC protocol (listed above)
+                        storage models:
+                            append only storage - append modified tuple to the first empty slot of the table and update a pointer from the older version to the new one (or vice versa O2N or N2O).
+                            time-travel storage - per table have time-travel table with the full tuples history.
+                            delta storage - per table have delta table with only delta history.
+                        Garbage collection approaches:
+                            tuple level - each tuple has versions and GC clears periodically or "cooperatively" (lazy - on other operation on the tuple.)
+                            transaction level - each txn keeps track of it's read/write set and DBMS determines when all versions created by the txn are no longer visible.
+                        Index management:
+                            secondery points to primery
+                            secondery points to hash table
+                            secondery holds phisical address (page and offset)
         Isolation:
-        Durability
+        Durability:
+            

@@ -102,4 +102,4 @@ Save and exit.
 
 Still as root, refresh grub with
 
-update-grub2
+grub2-mkconfig -o /boot/grub2/grub.cfg
