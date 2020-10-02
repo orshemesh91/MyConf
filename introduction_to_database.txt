@@ -342,4 +342,15 @@ Concurency control:
                             secondery holds phisical address (page and offset)
         Isolation:
         Durability:
-            
+            Steel policy - a non-commited transaction is allowed to "steel" a page from an already commited transaction (each one uses different tuples but the tuples are on the same page). Non-steel policy is the oposite.
+            force policy - force all txn's changes be flushed to no-volatole storage before the commit (all pages). non-force is the oposite.
+            non-steel + force: easiest way to guarantee durability. the problem is all pages of the txn must persist in RAM during the txn run-time. this can be handled by:
+                Shadow paging - copy on write pages with write txn operation to temporary place and have a shadow page table pointing to it. once the txn finished switch the page table pointer to point the shadow table such that the master table becomes the shadow one for the next txns.
+                this is bad idea
+            steel + no-force: log BEGIN, ACTIONS and COMMIT into a WAL (write ahead logs) ACTIONS are: txnId, objId, before val and after val
+                should have two log buffers - when one is hardened, the second one is already written in RAM. TODO Kopzon - why flushing after timeout (which's size is the flush duration helps?)
+                logical logging - save high level info about the changes to the DB
+                Checkpoints - log marker that says all buffer pool was flushed to disk, hence all commited txns are on disk, so log can be garbage collected.
+                
+                
+                
