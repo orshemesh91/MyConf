@@ -25,11 +25,13 @@ alias Kopzon='cd ~/EnvKopzon'
 alias e='emacs ~/.emacs . &'
 alias et='emacs ~/.emacs . --no-window-system'
 alias cmake='/usr/local/bin/cmake'
-alias gtags_full='gtags --gtagsconf ~/EnvKopzon/.globalrcFull'
+alias gtags_full='gtags --gtagsconf ~/MyConf/.globalrcFull'
+alias gtags_full='GTAGSFORCECPP=1 gtags --gtagsconf ~/MyConf/.globalrc'
 alias tags_py='find . -name "*.py" -print | etags -'
 alias tags_el='find . -name "*.el" -print | etags -'
 alias tags_c='find . -name "*.c*" -o -name "*.h" -print | etags -'
-alias shareF='mount -t vboxsf SharedWithVM /home/kopzoa/SharedWithHOST/'
+alias shareF='sudo mount -t vboxsf SharedWithVM ~/SharedWithHOST/'
+alias Kopzon='cd ~/MyConf/'
 
 
 
@@ -53,3 +55,9 @@ alias gkf='git branch -r | grep -E 3\.[05].*Kernel-Fixes'
 # $1 - branch name
 function gcg { git checkout $1 && gtags; }
 
+##########################################################
+########################### rdb ##########################
+##########################################################
+alias src='cd ~/rdb/src'
+alias src1='cd ~/rdb_1/src'
+alias src2='cd ~/rdb_2/src'

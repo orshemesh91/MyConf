@@ -225,8 +225,8 @@ JOIN Algorithms:
         record id (late materialization) - save a tuple with page id and record id (pointers) (not good for high scale systems)
     Nested Loop algorithm - if memory has B free blocks then bring B-2 blocks from the outer relation to memory and scan threw the inner relation blocks one by one (ont block for input and one for output). This one is mostly used when one of the relations fits the RAM
     Sort-Merge Algorithm - first sort the relations and then merge them (may need backtrack on the inner relation (save pointer of the first time you saw a value when incrementing the inner relation pointer))
-	    If the relation has an index that already sorted we don't have to do the sort phase.
-	    If we have an ORDER BY clause on the same attribute, then the JOIN's sorting operation output can be used for the ORDER BY calculation
+        If the relation has an index that already sorted we don't have to do the sort phase.
+        If we have an ORDER BY clause on the same attribute, then the JOIN's sorting operation output can be used for the ORDER BY calculation
 	Hash Algorithm - put both relations to a hash table by same hash function (first the outer relation then the inner). then go over the buckets and output the join.
         optimization - build a bloom filter when creating the outer hash table.
             bloom filter - "one way" filter - lookup bit map which supports insert() and lookup() API.
@@ -239,11 +239,11 @@ Query Plan:
         Vectorization model - like Iterator model but instead of each tuple propagate a block of tuples at once (batch processing). Best for OLAP
     Sequential scan optimizations:
         Prefetching
-		Buffer pool bypass
-		Paralleization
-		Zone maps - for each page save a meta data (in the page itself or in another dedicated page) that gives hints which help queries not access pages they don't need. Good for OLAP since they mostly don't update the tuples and so don't have to update the zone maps syncroniousely all the time
-		Late materialization - delay stiching togather tuples untill the upper part of the query plan - passing only offsets (pointers) if the upper parts don't really need the aggregation attribute from the lower parts.
-		Heap clustering - use sorted indexes where able to
+        Buffer pool bypass
+        Paralleization
+        Zone maps - for each page save a meta data (in the page itself or in another dedicated page) that gives hints which help queries not access pages they don't need. Good for OLAP since they mostly don't update the tuples and so don't have to update the zone maps syncroniousely all the time
+        Late materialization - delay stiching togather tuples untill the upper part of the query plan - passing only offsets (pointers) if the upper parts don't really need the aggregation attribute from the lower parts.
+        Heap clustering - use sorted indexes where able to
 	Index scan:
         scan threw an index (can by multiple indexes and then an intersention or union between them). The DBMS Optimizer decides whether to use index or sequential scan.
         if the index is unclustered, first figure out all the tuples needed for the query, sort them by their page id and then bring them to memory by their page id order to avoid buffer cache garbeging
@@ -257,13 +257,13 @@ Parallel vs distributed:
 Processing parallelizm:
     inter query
     intra query
-        inter operator
-		intra operator
+    inter operator
+    intra operator
     exchange operator - inner DBMS operation which is responsible of gathering data together after multi-threaded execution.
 storage parallelizm:
     basically the DBMS doesn't care about it and sits on anpther layer that controls the storage (e.g raid controller). The DBMS just controls the logical partitioning
         horizontal partitioning - sharding - different tupples of same table on different storage devices
-	    vertical partitioning - different attributes on different storage devices
+	vertical partitioning - different attributes on different storage devices
 
 Query optimization:
     rewrite the query to avoid redundant parts, estimate a cost of different possible query plans and choose the "cheepest" one.
@@ -278,9 +278,9 @@ Query optimization:
 Execution plan choose:
 	MongoDB runs a lot of query plans in parallel, returns the output of the first that returns and saves this plan for this query in a catalog, so next time this query is invoked, the DBMS will know which plan to execute. When the table changes more than by 10%, the cached plan is removed and next time the query will be invoked it will run again multiple plans to check if there is a better one (simple but working heuristic).
     System catalog - saves metadata about the tables, indexes and statistics for different optomizations. ANALYZE - system statistics builder - can be run at night to update the histograms and catalog but not colide with user queries
-	    Attribute correlated data - maintain attribute correlation to estimate query plan cost more efficiently. high end systems have it
-	    Histogram unique value occurence - per table, per attribute save an histogram that shows how much ocurences each value has. high end system have it
-	    Sampling - have a smaller selective table (e.g only 1 from each 10 tuples) and assume the selectivities are similar to the original table
+        Attribute correlated data - maintain attribute correlation to estimate query plan cost more efficiently. high end systems have it
+        Histogram unique value occurence - per table, per attribute save an histogram that shows how much ocurences each value has. high end system have it
+        Sampling - have a smaller selective table (e.g only 1 from each 10 tuples) and assume the selectivities are similar to the original table
 
 Concurency control:
     MySQL doesn't do transactions to be faster.
@@ -290,9 +290,9 @@ Concurency control:
             Logging - 
             Shadow paging - make a copy of every page the trx changes and arite them only at the trx commit. TODO Kopzon - how multiple page writes can be atomic? (old IBM approach)
         Consistency:
-			trx consistency 
+            trx consistency 
                 later trxs see results of older trxs (app responsibility).
-		    data base consistency
+            data base consistency
                 database follows integrity constraints (models the real world). If DB is consistent before a trx then it is consistent after it commits or aborts.
                     If transaction preserves consistency, every serializable schedule preserves consistency. DB ensures that resulting execution of trxs is equivalent to some serial execution of the trxs 
                     View serializability - 
@@ -301,7 +301,7 @@ Concurency control:
                             the two trxs read the same initial value
                             T1 sees T2.write(A) and vice versa
                             final value  of A is written by the same trx
-					Pasimistic approach - don't let problems arise in teh first place
+                    Pasimistic approach - don't let problems arise in teh first place
                         How to know is an execution schedule is correct without knowing the entire schedule ahead of time?
                         2PL (pasimistic) - concurency control protocol which guarantee conflict serialivability but is also subject to cascading aborts and limits concurency since guaranties more than needed (gives conflict serializability while needed only view serializability).
                             in which there are two phases:
@@ -351,6 +351,4 @@ Concurency control:
                 should have two log buffers - when one is hardened, the second one is already written in RAM. TODO Kopzon - why flushing after timeout (which's size is the flush duration helps?)
                 logical logging - save high level info about the changes to the DB
                 Checkpoints - log marker that says all buffer pool was flushed to disk, hence all commited txns are on disk, so log can be garbage collected.
-                
-                
                 
