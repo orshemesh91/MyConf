@@ -29,6 +29,9 @@ alias gtags_full='gtags --gtagsconf ~/EnvKopzon/.globalrcFull'
 alias tags_py='find . -name "*.py" -print | etags -'
 alias tags_el='find . -name "*.el" -print | etags -'
 alias tags_c='find . -name "*.c*" -o -name "*.h" -print | etags -'
+alias shareF='mount -t vboxsf SharedWithVM /home/kopzoa/SharedWithHOST/'
+
+
 
 # $1 - pattern
 # $2 - src

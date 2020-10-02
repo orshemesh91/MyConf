@@ -15,13 +15,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#e090d7" "#8cc4ff" "#eeeeec"])
  '(company-cmake-executable "/usr/local/bin/cmake")
  '(custom-enabled-themes (quote (AAA_PuTTY)))
  '(custom-safe-themes
    (quote
-    ("08f3c9e1ac1ba58e11783144edbc4a90963307dc074f4bb01aa0e7a5ce7e4e8f" default)))
+    ("0e2b66b9e7546ff081d38563588aace0a41542ba337d7e07e4bbf15200b8a461" "4e06beec75a1ba59618e082cd15da06ba10a87a87bce47ffbaf2bbd2fecae9a8" "eae45902d78001e3ccd01101a9182cf1e98dd3a9d9d51acd27c3c4ca05e60632" "090c41088dc33d0a0f15cc34509da36285af56ee099b5a6303f7206eafdc5986" "831ea38af506042c10f8351df28752d7b378338721d3d9827e6e9b90fecd1576" "70a5cc9fcf470b47ff1498bc08d213dbef3138fd08d1df76c587d092cce1cee4" "30e3972b271835ef1b5da4e1360e4bd4480acdaa715e8b6a282c54eb478ec81b" "b014df8cdac0f843546e85f72b163ba7acc9fc829b5a2e90e07285ee0595479a" "32f4b70f754b623eab789e5e45e0b5d4c057841f7265e58b3841ec149067c77f" "f77928c554ad6b8a72310d91bf7ec02c27bf1f662abb8c92833f6939fa401c72" "08f3c9e1ac1ba58e11783144edbc4a90963307dc074f4bb01aa0e7a5ce7e4e8f" default)))
  '(custom-theme-directory "~/.emacs.d/themes")
  '(desktop-save-mode nil)
  '(display-line-numbers t)
