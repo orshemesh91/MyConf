@@ -351,4 +351,20 @@ Concurency control:
                 should have two log buffers - when one is hardened, the second one is already written in RAM. TODO Kopzon - why flushing after timeout (which's size is the flush duration helps?)
                 logical logging - save high level info about the changes to the DB
                 Checkpoints - log marker that says all buffer pool was flushed to disk, hence all commited txns are on disk, so log can be garbage collected.
-                
+            crash recovery:
+                writing log records:
+                    pageLSN - the LSN (log sequence number) of the most recent update for a data page (page can be flushed only after the log corresponding to it's LSN is already flushed)
+                    flushLSN - the most recent flushed LSN. update every time the DBMS erites a WAL (write ahead log) page to memory
+                    recLSN - on each page record. the LSN of the log record that first caused the pade to be dirty (brought the page into memory for write)
+                    prevLSN - on each log record the previous LSN or a given transaction (makes your life easier to track all transactions actions during UNDO phase)
+                    CLR - (compensation log records) log records that describe an UNDO operation after abort. undoNextLSN - the next to-be-undone LSN. CLR never need to be undone (TODO Kopzon - understand it again)
+                    TRANSACTION END - a new log record that says "this transaction hardened everything to this point of the log at recovery". printed to the log after the last CLR on abort flow
+                    fuzzy checkpoints:
+                        CHACKPOINT BEGIN and CHECKPOINT END (with ATT{active transaction table} and DPT{dirty page table}).
+                        LSN of the CHECKPOINT BEGIN is hardened when the chackpoint finishes. any txn that starts after the checkpoint is axcluded from ATT
+                the recovery itself:
+                    Analysis - scan the WAL from the CHECKPOINT START till the end and figure out the txns than failed or commited since then 
+                    Redo - go to smallest recLSN in DPT and redo (reapply and set pageLSN to curr record's LSN) all (unless affected page is not in DPT or page recLSN is higher then current record's LSN) log records from than till the end of the log. At the end write TXN END and remove from ATT all comitted transactions
+                    Undo - undo all the log records of failed txns (aborted or not commited after redo) from the end till the oldest log record of any txn from ATT. write CLR after each undo operation for recovery after crash during recovery.
+                    
+                    
