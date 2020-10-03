@@ -283,8 +283,8 @@ Execution plan choose:
         Sampling - have a smaller selective table (e.g only 1 from each 10 tuples) and assume the selectivities are similar to the original table
 
 Concurency control:
-    MySQL doesn't do transactions to be faster.
-	ACID:
+    MySQL doesn't do transactions to be faster - single thereaded.
+    ACID:
         Atomicity:
             trx finishes with commit or abort
             Logging - 
@@ -366,5 +366,11 @@ Concurency control:
                     Analysis - scan the WAL from the CHECKPOINT START till the end and figure out the txns than failed or commited since then 
                     Redo - go to smallest recLSN in DPT and redo (reapply and set pageLSN to curr record's LSN) all (unless affected page is not in DPT or page recLSN is higher then current record's LSN) log records from than till the end of the log. At the end write TXN END and remove from ATT all comitted transactions
                     Undo - undo all the log records of failed txns (aborted or not commited after redo) from the end till the oldest log record of any txn from ATT. write CLR after each undo operation for recovery after crash during recovery.
-                    
-                    
+Distributed DBMS:
+    share nothing - TODO Kopzon - ensure that our rdb is using this approach
+    horizontal partitioning/sharding - split rows accross different machines
+        hash partitioning - sequential scans are more expensive and adding another partition changes the whole hash function and thus can lead to whole DB's data migration.
+            consistent hashing - partitions sit on a continues 0-1 ranged ring. hash a key to a value between 0-1 (continues, not like modulo). then choose the closest partition which is higher positioned on the ring. add new partition to the longest arch in the ring and migrate data only from the next, already existing partition (same on partition removal).
+    Transaction coordination:
+        Centralized - global traffic "cop" - each transaction goes threw the coordinator on the way to the data nodes and back!
+        De-Centralized - nodes organaize themselves
