@@ -3,12 +3,16 @@ Introduction
 
 Storage access times:
     L1 cache - 0.5 ns
-	L2 cache - 7 ns
-	DRAM -  100 ns
-	SSD - 150,000 ns = 150 micro sec
-	HDD - 10,000,000 ns = 10 milli sec
-	Network storage - 30,000,000 ns = 30 milli sec
-	tape archives - 1,000,000,000 ns = 1 sec
+    L2 cache - 7 ns
+    DRAM -  100 ns
+    SSD - 150,000 ns = 150 micro sec
+    HDD - 10,000,000 ns = 10 milli sec
+    Network storage - 30,000,000 ns = 30 milli sec
+    tape archives - 1,000,000,000 ns = 1 sec
+
+Network access times:
+    local VLAN - 100 micro sec
+    ping to google 8.8.8.8 - WAN - 50 milli sec
 
 DBMS - database management system - allows definition, creation, querying, update and administration of databases
 DML - data manipulation languages:
@@ -374,4 +378,26 @@ Distributed DBMS:
     Transaction coordination:
         Centralized - global traffic "cop" - each transaction goes threw the coordinator on the way to the data nodes and back!
         De-Centralized - nodes organaize themselves
-
+    Atomic commit protocol (concensus):
+        Two Phase Commit - coordinator node sends "prepare" message to participant nodes, gets ack from them, then sends "commit" message, gets ack from them and finally sends ack to the application. optimizations:
+            participants can send the prepare ack as part of the result of the last task sent to them by the coordinator.
+            coordinator can ack the application about commit before actually receiving the second phase ack from the participants. in this case if the participant falls during the commit phase, it will have to communicate the coordinator during the analysis phase on it'srecovery.
+        Paxos - more network traffic but needs only majority to commit, stalls less the whole txn. TODO Kopzon - how the hell majority is enough to commit?
+    Replication:
+        Replication configurations:
+            Master-Replica - writes only on master (sometimes reads also), propagate the changes to the replicas async (no need for atomic comit protocol). Can also be sync, if we want to guarantee k-safety.
+            Multi-Master - read & write to all replicas, use atomic commit protocol to sync the replicas
+        propagation scheme:
+            sync - ack the user only after the replicas hardened the txn logs also
+            async - ack the user after the txn is hardened in the local DBMS only (async replication)
+        propagation timing:
+            continues - DBMS sends the log message to the replica immediately as it generates is.
+            on commit - send the log message only after it was commited on the Master. slower, but less network traffic (also assumes the txn log fits entierely in the memory)
+        execution:
+            active-active - query executes on both replicas
+            active-passive - query executes on master and results are propagated to slaves.
+        CAP theorem - you cannot achive the three of the below at the same time:
+            Consistency - both replica's applications should always see the same consistant data image at any time.
+            Availability - when one replica is down there is always an available replica for any application to use.
+            Partition tolerant - when network between replicas is down, and two DBs are in non-consistens state because of it, when the network is up again, the system should be able to get back into consistent state. It can be achived by avoiding "split brains" or conflict resolution algorthms after reconnect.
+    Federated DBs - distributed arch that combines multiple DB software

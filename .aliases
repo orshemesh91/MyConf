@@ -51,6 +51,7 @@ alias gcb='git checkout -b'
 alias gpo='git push -u origin'
 alias gcp='git cherry-pick -x'
 alias gkf='git branch -r | grep -E 3\.[05].*Kernel-Fixes'
+alias git_save_credentials='git config --global credential.helper store'
 
 # $1 - branch name
 function gcg { git checkout $1 && gtags; }
