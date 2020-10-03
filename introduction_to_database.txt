@@ -401,3 +401,17 @@ Distributed DBMS:
             Availability - when one replica is down there is always an available replica for any application to use.
             Partition tolerant - when network between replicas is down, and two DBs are in non-consistens state because of it, when the network is up again, the system should be able to get back into consistent state. It can be achived by avoiding "split brains" or conflict resolution algorthms after reconnect.
     Federated DBs - distributed arch that combines multiple DB software
+    OLTP - usually the transactions manipulate data which resides on a single node *
+    OLAP or DSS (decision support systems) or backend wherehouse:
+        star schema - FACT table + one level of dimentions table pointed from the FACT bable
+        snowflake schema - FACT table + multi level on dimentions table - easier to maintain query applications but more joins to be done.
+        pull schema - pull the relevant data to the node that got the query
+        push schema - push the query to the nodes that contain the relevant data.
+        most OLAP systems don't support query fault tolerance.
+        query plan must take into account the network communication issue. There are two main approaches for this:
+            generate a single query plan and break it up to paartition specific fragments (most DBs use this approach)
+            rewrite the query into partition specific queries and allow for local optimizations to run on each execution node.
+        JOIN - when query doesn't fit one machine, we hash the tables by the same attribute and same hash function, split the buckets on different nodes, join separately and at the end send the join output portions to the user threw the machine that got the query.
+        OLAP systems support all write protections talked above also, since they get the data from the OLTP DBs threw some conversion engine.
+        SEMI JOIN - rewrite query if not all tuple info is needed to be output.
+        
