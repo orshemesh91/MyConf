@@ -374,3 +374,4 @@ Distributed DBMS:
     Transaction coordination:
         Centralized - global traffic "cop" - each transaction goes threw the coordinator on the way to the data nodes and back!
         De-Centralized - nodes organaize themselves
+
