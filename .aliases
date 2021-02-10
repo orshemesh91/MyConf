@@ -21,18 +21,17 @@ function khg { grep -i "$1" ~/EnvKopzon/Commands/history --color; }
 alias khs="history 2 | head -1 | sed 's/[^ ]* *//' | sed 's/[^ ]* *//' >> ~/EnvKopzon/Commands/history"
 alias hg="history | grep"
 alias xsc='xclip -sel clip'
-alias Kopzon='cd ~/EnvKopzon'
 alias e='emacs ~/.emacs . &'
 alias et='emacs ~/.emacs . --no-window-system'
 alias cmake='/usr/local/bin/cmake'
-alias gtags_full='gtags --gtagsconf ~/MyConf/.globalrcFull'
-alias gtags_full='GTAGSFORCECPP=1 gtags --gtagsconf ~/MyConf/.globalrc'
+unalias gtags
+alias gt_full='GTAGSFORCECPP=1 gtags --gtagsconf ~/MyConf/.globalrcFull'
+alias gt='GTAGSFORCECPP=1 gtags --gtagsconf ~/MyConf/.globalrc'
 alias tags_py='find . -name "*.py" -print | etags -'
 alias tags_el='find . -name "*.el" -print | etags -'
 alias tags_c='find . -name "*.c*" -o -name "*.h" -print | etags -'
 alias shareF='sudo mount -t vboxsf SharedWithVM ~/SharedWithHOST/'
-alias Kopzon='cd ~/MyConf/'
-
+alias mountS='sudo mount -t vboxsf SharedWithVM ~/SharedWithHOST/'
 
 
 # $1 - pattern
@@ -46,12 +45,13 @@ function copy_files_by_pattern { if [ "$#" -ne 3 ]; then echo "args: pattern src
 alias gl='git log --format="%h %C(bold red)%ad %Creset%Cred(%ar) %Creset%C(bold green)%an%C(bold yellow)%d %C(reset)%s" --date=short'
 alias lscore='ls $(dirname $(cat /proc/sys/kernel/core_pattern))/core*'
 alias gs='git branch && git status'
-alias gc='git checkout'
-alias gcb='git checkout -b'
+alias gco='git checkout'
+alias gcob='git checkout -b'
 alias gpo='git push -u origin'
 alias gcp='git cherry-pick -x'
 alias gkf='git branch -r | grep -E 3\.[05].*Kernel-Fixes'
 alias git_save_credentials='git config --global credential.helper store'
+alias glast='git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format="%(refname:short)"'
 
 # $1 - branch name
 function gcg { git checkout $1 && gtags; }
@@ -59,6 +59,16 @@ function gcg { git checkout $1 && gtags; }
 ##########################################################
 ########################### rdb ##########################
 ##########################################################
+# $1 - repository number
+function RDB { cd ~/rdb_$1/; }
+function SRC { cd ~/rdb_$1/src/; }
+
 alias src='cd ~/rdb/src'
-alias src1='cd ~/rdb_1/src'
-alias src2='cd ~/rdb_2/src'
+alias rdb='cd ~/rdb/'
+alias bld='./rebuild.sh clang Debug 0'
+alias bldgcc='./rebuild.sh gcc Debug 0'
+
+alias cloneRDB='git clone https://github.com/eranborovik/rdb.git'
+alias upDate='sudo ~/upDate.sh'
+alias cleanRep='rm -rfd *core.* *trace.* *.trace* *.log test__* /tmp/tmp.* /tmp/vgdb-pipe-* /tmp/lto-llvm-* /tmp/nos_dev* /tmp/chunker_file* ./nos_node_*/'
+
