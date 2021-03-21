@@ -73,3 +73,4 @@ alias cloneRDB='git clone https://github.com/eranborovik/rdb.git'
 alias upDate='sudo ~/upDate.sh'
 alias cleanRep='rm -rfd *core.* *trace.* *.trace* *.log test__* /tmp/tmp.* /tmp/vgdb-pipe-* /tmp/lto-llvm-* /tmp/nos_dev* /tmp/chunker_file* ./nos_node_*/'
 
+alias lltmp='ll /tmp/tmp.* | sort -k 8 | sort -k 7'
