@@ -5,6 +5,7 @@ mv ~/.gdbinit ~/.old_gdbinit
 
 ln -s $PWD/.bashrc ~/.bashrc
 ln -s $PWD/.aliases ~/.aliases
+ln -s $PWD/.gdbinit ~/.gdbinit
 # ln -s $PWD/.screenrc ~/.screenrc
 
 source $PWD/.bashrc ~/.bashrc

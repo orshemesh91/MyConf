@@ -94,3 +94,6 @@ for brch in $(git branch -r | grep -i $2); do
 done
 }
 source scl_source enable devtoolset-8 llvm-toolset-7.0
+
+source /home/orshemesh/rdb/setup_rdb_python.sh > /dev/null
+source /home/orshemesh/rdb2/setup_rdb_python.sh > /dev/null
