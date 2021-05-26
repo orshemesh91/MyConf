@@ -14,7 +14,7 @@ if [ -f ~/.aliases ]; then
     . ~/.aliases
 fi
 
-echo Current path $PATH
+# echo Current path $PATH
 PATH=$PATH:/usr/local/bin/:/home/linuxbrew/.linuxbrew/bin/:/usr/local/bin/
 
 ### Prompt
@@ -88,7 +88,7 @@ for brch in $(git branch -r | grep -i $2); do
         echo "Checking ${cur}";
         git ls-tree -r $(echo ${cur}| awk -F- '{print $2}') | grep $1 && echo 'FOUND IT!' && found=1 && break;
     done;
-    if [ $found -eq 1 ]; then 
+    if [ $found -eq 1 ]; then
         break;
     fi;
 done

@@ -25,7 +25,6 @@ alias xsc='xclip -sel clip'
 alias e='emacs ~/.emacs . &'
 alias et='emacs ~/.emacs . --no-window-system'
 alias cmake='/usr/local/bin/cmake'
-unalias gtags
 alias gt_full='GTAGSFORCECPP=1 gtags --gtagsconf ~/MyConf/.globalrcFull'
 alias gt='GTAGSFORCECPP=1 gtags --gtagsconf ~/MyConf/.globalrc'
 alias tags_py='find . -name "*.py" -print | etags -'
