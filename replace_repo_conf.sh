@@ -2,6 +2,7 @@ git branch -D tmp
 git checkout -b tmp
 
 cp ~/.bashrc $PWD/.bashrc
+cp ~/.bash_profile $PWD/.bash_profile
 cp ~/.aliases $PWD/.aliases
 cp ~/.gdbinit $PWD/.gdbinit
 # cp ~/.screenrc $PWD/.screenrc
