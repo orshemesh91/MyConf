@@ -70,6 +70,5 @@ alias bldgcc='./rebuild.sh gcc Debug 0'
 
 alias cloneRDB='git clone https://github.com/eranborovik/rdb.git'
 alias upDate='sudo ~/upDate.sh'
-alias cleanRep='rm -rfd *core.* *trace.* *.trace* *.log test__* /tmp/tmp.* /tmp/vgdb-pipe-* /tmp/lto-llvm-* /tmp/nos_dev* /tmp/chunker_file* ./nos_node_*/ rdb_test_*_node_*'
-
+alias cleanRep='rm -rfd *core.* *trace.* *.trace* *.log test__* /tmp/tmp.* /tmp/vgdb-pipe-* /tmp/lto-llvm-* /tmp/nos_dev* /tmp/chunker_file* ./nos_node_*/ rdb_test_*_node_* ./staging_*'
 alias lltmp='ll /tmp/tmp.* | sort -k 8 | sort -k 7'
